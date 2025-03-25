@@ -35,7 +35,9 @@ Then, you can continue with
 npm install
 ```
 
-## Run the server
+## Run the server 
+#### ⚠️(Please make sure you complete the previous step before continuing)
+
 After installing node modules, you should be able to start the server through:
 
 ```bash
@@ -43,3 +45,39 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Contributing and Using Git Branches
+
+To contribute to the project, follow these steps:
+
+🌿 Create a new branch
+
+If you’re starting work on a new task:
+```bash
+git checkout -b your-branch-name
+```
+
+Use a meaningful name like:
+
+```bash
+git checkout -b Katherine-LandingPage
+```
+
+📂 Make changes and commit
+
+After editing files, stage and commit your changes:
+
+```bash
+git add .
+git commit -m "Short description of your change"
+```
+
+⬆️ Push your branch to GitHub
+
+```bash
+git push origin your-branch-name
+```
+
+✅ Open a Pull Request
+
+Go to the repository on GitHub, and you'll see an option to “Compare & pull request” for your branch. Open a pull request and request reviews from teammates.
