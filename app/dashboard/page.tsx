@@ -6,6 +6,7 @@ import Sidebar from '../components/Sidebar';
 import CourseBlock from '../components/CourseBlock';
 import CreateCourseModal from '../components/CreateCourseModal';
 import { apiFunctions, Course } from '@/lib/api';
+import { useUser } from '../contexts/UserContext';
 
 function compareSemesters(a: string, b: string) {
   const [seasonA, yearA] = a.split(' ');
@@ -20,6 +21,7 @@ function compareSemesters(a: string, b: string) {
 
 export default function Dashboard() {
     const router = useRouter();
+    const { role } = useUser();
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState('name');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -27,30 +29,87 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCourses = async () => {
-            try {
-                const fetchedCourses = await apiFunctions.getCourses();
-                setCourses(fetchedCourses);
-            } catch (error) {
-                console.error('Error fetching courses:', error);
-            } finally {
-                setIsLoading(false);
+        // Simulate API call with hard-coded data
+        const sampleCourses: Course[] = [
+            {
+                id: 1,
+                name: "Programming & Problem Solving",
+                number: "CSC 121",
+                term: "Spring 2025",
+                section: "A",
+                department: "Computer Science",
+                created_at: "2025-01-15",
+                updated_at: "2025-01-15"
+            },
+            {
+                id: 2,
+                name: "Data Structures",
+                number: "CSC 221",
+                term: "Spring 2025",
+                section: "B",
+                department: "Computer Science",
+                created_at: "2025-01-16",
+                updated_at: "2025-01-16"
+            },
+            {
+                id: 3,
+                name: "Computer Organization",
+                number: "CSC 250",
+                term: "Spring 2025",
+                section: "A",
+                department: "Computer Science",
+                created_at: "2025-01-17",
+                updated_at: "2025-01-17"
+            },
+            {
+                id: 4,
+                name: "Programming & Problem Solving",
+                number: "CSC 121",
+                term: "Spring 2024",
+                section: "A",
+                department: "Computer Science",
+                created_at: "2024-01-15",
+                updated_at: "2024-01-15"
+            },
+            {
+                id: 5,
+                name: "Data Structures",
+                number: "CSC 221",
+                term: "Spring 2024",
+                section: "B",
+                department: "Computer Science",
+                created_at: "2024-01-16",
+                updated_at: "2024-01-16"
+            },
+            {
+                id: 6,
+                name: "Data Structures",
+                number: "CSC 221",
+                term: "Fall 2023",
+                section: "B",
+                department: "Computer Science",
+                created_at: "2023-09-16",
+                updated_at: "2023-09-16"
             }
-        };
+        ];
 
-        fetchCourses();
+        // Simulate network delay
+        setTimeout(() => {
+            setCourses(sampleCourses);
+            setIsLoading(false);
+        }, 500);
     }, []);
 
     const currentCourses = courses.filter(course => 
-        course.term === 'Spring' || course.term === 'Fall'
+        course.term.includes('Spring 2025')
     );
 
     const pastCourses = courses.filter(course => 
-        course.term !== 'Spring' && course.term !== 'Fall'
+        course.term !== 'Spring 2025'
     );
 
     const handleCourseClick = (course: Course) => {
-        router.push(`/course/${course.id}-${course.term}`);
+        router.push(`/course/${course.id}`);
     };
 
     const filteredPastCourses = pastCourses
@@ -81,7 +140,9 @@ export default function Dashboard() {
         <div className="flex min-h-screen">
             <Sidebar />
             <div className="flex-1 p-8 bg-gray-50">
-                <h1 className="text-2xl font-bold text-gray-700 mb-6">Dashboard - Instructor & Student</h1>
+                <h1 className="text-2xl font-bold text-gray-700 mb-6">
+                    Dashboard - {role === 'instructor' ? 'Instructor' : 'Student'}
+                </h1>
 
                 <section className="mb-8">
                     <h2 className="text-xl font-bold text-gray-700 mb-4">Current</h2>
@@ -141,14 +202,16 @@ export default function Dashboard() {
                     </div>
                 </section>
 
-                <div className="fixed bottom-4 right-4">
-                    <button 
-                        onClick={() => setIsCreateModalOpen(true)}
-                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center gap-2 shadow-md"
-                    >
-                        Create New Course
-                    </button>
-                </div>
+                {role === 'instructor' && (
+                    <div className="fixed bottom-4 right-4">
+                        <button 
+                            onClick={() => setIsCreateModalOpen(true)}
+                            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center gap-2 shadow-md"
+                        >
+                            Create New Course
+                        </button>
+                    </div>
+                )}
 
                 <CreateCourseModal 
                     isOpen={isCreateModalOpen}

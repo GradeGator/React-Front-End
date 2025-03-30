@@ -1,5 +1,6 @@
 import './globals.css';
 import { AuthProvider } from '@/lib/contexts/AuthContext';
+import { UserProvider } from '@/app/contexts/UserContext';
 
 export const metadata = {
   title: 'Grade Gator',
@@ -11,7 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen bg-gray-50">
         <AuthProvider>
-          {children}
+          <UserProvider>
+            {children}
+          </UserProvider>
         </AuthProvider>
       </body>
     </html>
