@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Course } from '@/lib/api';
 import { FaSearch } from 'react-icons/fa';
 import CourseSidebarInstructor from './CourseSidebarInstructor';
+import { useRouter } from 'next/navigation';
 
 interface Assignment {
   id: number;
@@ -25,6 +26,7 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
   const [assignmentType, setAssignmentType] = useState<'all' | 'homework' | 'quiz' | 'others'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAssignments, setSelectedAssignments] = useState<number[]>([]);
+  const router = useRouter();
 
   // Hard-coded assignments data for demonstration
   const assignments: Assignment[] = [
@@ -197,6 +199,7 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
             <div className="fixed bottom-4 right-4">
               <button 
                 className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center gap-2 shadow-md"
+                onClick={() => router.push(`/new-assignment?courseId=${course.id}`)}
               >
                 Create New Assignment
               </button>

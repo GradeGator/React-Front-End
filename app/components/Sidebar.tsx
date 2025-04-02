@@ -2,6 +2,7 @@
 
 import { FaBook, FaCog, FaInfoCircle } from 'react-icons/fa';
 import { useUser } from '../contexts/UserContext';
+import Image from 'next/image';
 
 export default function Sidebar() {
   const { role, setRole } = useUser();
@@ -10,7 +11,7 @@ export default function Sidebar() {
     <div className="h-screen w-64 bg-white shadow-md flex flex-col justify-between">
       {/* Logo */}
       <div className="p-6 flex items-center gap-2">
-        <img src="/logo.svg" alt="Grade Gator" className="h-8 w-8" />
+        <Image src="/logo.svg" alt="Grade Gator" width={32} height={32} className="h-8 w-8" />
         <h1 className="text-xl font-bold text-green-600">Grade Gator</h1>
       </div>
 
@@ -40,9 +41,11 @@ export default function Sidebar() {
         {/* Profile */}
         <div className="mt-6">
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src="/user-avatar.svg"
               alt="Profile"
+              width={40}
+              height={40}
               className="h-10 w-10 rounded-full"
             />
             <div>

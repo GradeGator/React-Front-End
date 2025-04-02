@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const user = await getCurrentUser();
       setUser(user);
-    } catch (error) {
+    } catch {
       setError('Failed to fetch user data');
     } finally {
       setIsLoading(false);
@@ -45,8 +45,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const user = await authLogin(credentials);
       setUser(user);
-    } catch (error: any) {
-      setError(error.message || 'Failed to login');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to login';
+      setError(errorMessage);
       throw error;
     } finally {
       setIsLoading(false);
@@ -59,8 +60,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authLogout();
       setUser(null);
-    } catch (error: any) {
-      setError(error.message || 'Failed to logout');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to logout';
+      setError(errorMessage);
       throw error;
     } finally {
       setIsLoading(false);

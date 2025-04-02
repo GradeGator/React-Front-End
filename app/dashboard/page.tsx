@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '../components/Sidebar';
 import CourseBlock from '../components/CourseBlock';
 import CreateCourseModal from '../components/CreateCourseModal';
-import { apiFunctions, Course } from '@/lib/api';
+import { Course } from '@/lib/api';
 import { useUser } from '../contexts/UserContext';
 
 function compareSemesters(a: string, b: string) {
   const [seasonA, yearA] = a.split(' ');
-  const [seasonB, yearB] = b.split(' ');
+  const [, yearB] = b.split(' ');
 
   if (parseInt(yearA) !== parseInt(yearB)) {
     return parseInt(yearB) - parseInt(yearA); // Higher year first
