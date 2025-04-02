@@ -32,7 +32,7 @@ const CreateAssignment: React.FC = () => {
   };
 
   const handleNext = () => {
-    router.push("./configure-autograder/page"); // Change "next-page" to the actual route
+    router.push("./configure-autograder"); // Change "next-page" to the actual route
   };
 
   return (
