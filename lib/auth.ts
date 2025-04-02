@@ -46,17 +46,17 @@ class AuthenticationError extends Error {
 
 export const login = async (credentials: LoginCredentials): Promise<User> => {
   try {
-    // First, attempt to login
     await api.post('/api-auth/login/', credentials);
     
     // If login successful, get user data
     const response = await api.get<User>('/current-user/');
     return response.data;
-  } catch (error: any) {
-    if (error.response) {
+  } catch (error) {
+    if (error && typeof error === 'object' && 'response' in error) {
+      const apiError = error as { response?: { data?: { detail?: string }, status?: number } };
       throw new AuthenticationError(
-        error.response.data.detail || 'Invalid credentials',
-        error.response.status
+        apiError.response?.data?.detail || 'Invalid credentials',
+        apiError.response?.status
       );
     }
     throw new AuthenticationError('Network error occurred while logging in');
@@ -66,7 +66,7 @@ export const login = async (credentials: LoginCredentials): Promise<User> => {
 export const logout = async (): Promise<void> => {
   try {
     await api.post('/api-auth/logout/');
-  } catch (error: any) {
+  } catch {
     throw new AuthenticationError('Error occurred while logging out');
   }
 };
@@ -75,11 +75,14 @@ export const getCurrentUser = async (): Promise<User | null> => {
   try {
     const response = await api.get<User>('/current-user/');
     return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 401) {
-      return null; // Not authenticated
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'response' in error) {
+      const apiError = error as { response?: { status?: number } };
+      if (apiError.response?.status === 401) {
+        return null; // Not authenticated
+      }
     }
-    throw new AuthenticationError('Error fetching user data');
+    throw new AuthenticationError('Error fetching current user');
   }
 };
 

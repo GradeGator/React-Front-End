@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const CreateAssignment: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get('courseId');
+  
   const [assignmentName, setAssignmentName] = useState("");
   const [autoGraderPoints, setAutoGraderPoints] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
@@ -32,7 +35,23 @@ const CreateAssignment: React.FC = () => {
   };
 
   const handleNext = () => {
-    router.push("./configure-autograder"); // Change "next-page" to the actual route
+    // Store assignment data in sessionStorage
+    const assignmentData = {
+      assignmentName,
+      autoGraderPoints,
+      releaseDate,
+      dueDate,
+      lateDueDate,
+      enableAnonymous,
+      enableManual,
+      allowLateSubmissions,
+      enableGroup,
+      rubric,
+      courseId
+    };
+    
+    sessionStorage.setItem("assignmentData", JSON.stringify(assignmentData));
+    router.push("./configure-autograder");
   };
 
   return (

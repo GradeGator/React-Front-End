@@ -16,7 +16,7 @@ const api: AxiosInstance = axios.create({
 function getCsrfToken(): string | null {
   const tokenCookieName = 'csrftoken';
   const cookies = document.cookie.split(';');
-  for (let cookie of cookies) {
+  for (const cookie of cookies) {
     const [name, value] = cookie.trim().split('=');
     if (name === tokenCookieName) {
       return value;
