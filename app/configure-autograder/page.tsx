@@ -48,7 +48,6 @@ const NextPage: React.FC = () => {
     formData.append("enableManual", assignmentData.enableManual);
     formData.append("allowLateSubmissions", assignmentData.allowLateSubmissions);
     formData.append("enableGroup", assignmentData.enableGroup);
-    formData.append("enableLeaderboard", assignmentData.enableLeaderboard);
     formData.append("rubric", JSON.stringify(assignmentData.rubric));
     formData.append("autograderFile", selectedFile);
 
@@ -98,7 +97,7 @@ const NextPage: React.FC = () => {
           onClick={handleUpload}
           className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
         >
-          Upload
+          Upload file
         </button>
       </div>
 
