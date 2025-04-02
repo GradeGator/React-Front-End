@@ -1,7 +1,11 @@
-import { FaBook, FaCog, FaInfoCircle, FaUser } from 'react-icons/fa';
-import { MdOutlineCreate } from 'react-icons/md';
+'use client'
+
+import { FaBook, FaCog, FaInfoCircle } from 'react-icons/fa';
+import { useUser } from '../contexts/UserContext';
 
 export default function Sidebar() {
+  const { role, setRole } = useUser();
+
   return (
     <div className="h-screen w-64 bg-white shadow-md flex flex-col justify-between">
       {/* Logo */}
@@ -34,15 +38,24 @@ export default function Sidebar() {
         </ul>
 
         {/* Profile */}
-        <div className="mt-6 flex items-center gap-3 cursor-pointer">
-          <img
-            src="/user-avatar.svg"
-            alt="Profile"
-            className="h-10 w-10 rounded-full"
-          />
-          <div>
-            <p className="font-medium text-gray-700">Louise Thompson</p>
-            <p className="text-sm text-gray-500">Instructor</p>
+        <div className="mt-6">
+          <div className="flex items-center gap-3">
+            <img
+              src="/user-avatar.svg"
+              alt="Profile"
+              className="h-10 w-10 rounded-full"
+            />
+            <div>
+              <p className="font-medium text-gray-700">Louise Thompson</p>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value as 'student' | 'instructor')}
+                className="text-sm text-gray-500 bg-transparent border-none focus:ring-0 cursor-pointer hover:text-green-600 p-0"
+              >
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
