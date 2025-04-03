@@ -1,22 +1,26 @@
 'use client'
 
 import React from 'react';
+import { Course } from '@/lib/api';
+import { Dispatch, SetStateAction } from 'react';
 
 interface CourseSidebarInstructorProps {
-  activeTab?: 'assignments' | 'gradebook' | 'roster' | 'documents';
-  onTabChange?: (tab: 'assignments' | 'gradebook' | 'roster' | 'documents') => void;
+  course: Course;
+  activeTab: 'assignments' | 'gradebook' | 'roster' | 'documents';
+  setActiveTab: Dispatch<SetStateAction<'assignments' | 'gradebook' | 'roster' | 'documents'>>;
 }
 
 export default function CourseSidebarInstructor({ 
-  activeTab = 'assignments',
-  onTabChange 
+  course,
+  activeTab,
+  setActiveTab 
 }: CourseSidebarInstructorProps) {
   return (
     <aside className="w-64 min-h-screen bg-white border-r">
       <nav className="p-4">
         <div className="mb-4">
           <button 
-            onClick={() => onTabChange?.('assignments')}
+            onClick={() => setActiveTab('assignments')}
             className={`w-full px-4 py-2 text-left rounded-lg transition-colors ${
               activeTab === 'assignments'
                 ? 'bg-green-100 text-green-600'
@@ -28,7 +32,7 @@ export default function CourseSidebarInstructor({
         </div>
         <div className="mb-4">
           <button 
-            onClick={() => onTabChange?.('gradebook')}
+            onClick={() => setActiveTab('gradebook')}
             className={`w-full px-4 py-2 text-left rounded-lg transition-colors ${
               activeTab === 'gradebook'
                 ? 'bg-green-100 text-green-600'
@@ -40,7 +44,7 @@ export default function CourseSidebarInstructor({
         </div>
         <div className="mb-4">
           <button 
-            onClick={() => onTabChange?.('roster')}
+            onClick={() => setActiveTab('roster')}
             className={`w-full px-4 py-2 text-left rounded-lg transition-colors ${
               activeTab === 'roster'
                 ? 'bg-green-100 text-green-600'
@@ -52,7 +56,7 @@ export default function CourseSidebarInstructor({
         </div>
         <div className="mb-4">
           <button 
-            onClick={() => onTabChange?.('documents')}
+            onClick={() => setActiveTab('documents')}
             className={`w-full px-4 py-2 text-left rounded-lg transition-colors ${
               activeTab === 'documents'
                 ? 'bg-green-100 text-green-600'

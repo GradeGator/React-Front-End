@@ -71,47 +71,47 @@ export const logout = async (): Promise<void> => {
   }
 };
 
-export const getCurrentUser = async (): Promise<User | null> => {
-  try {
-    const response = await api.get<User>('/current-user/');
-    return response.data;
-  } catch (error: unknown) {
-    if (error && typeof error === 'object' && 'response' in error) {
-      const apiError = error as { response?: { status?: number } };
-      if (apiError.response?.status === 401) {
-        return null; // Not authenticated
-      }
-    }
-    throw new AuthenticationError('Error fetching current user');
-  }
-};
+// export const getCurrentUser = async (): Promise<User | null> => {
+//   try {
+//     // const response = await api.get<User>('/current-user/');
+//     return response.data;
+//   } catch (error: unknown) {
+//     if (error && typeof error === 'object' && 'response' in error) {
+//       const apiError = error as { response?: { status?: number } };
+//       if (apiError.response?.status === 401) {
+//         return null; // Not authenticated
+//       }
+//     }
+//     throw new AuthenticationError('Error fetching current user');
+//   }
+// };
 
 // Check if the user is authenticated and is staff
-export const isAuthenticatedStaff = async (): Promise<boolean> => {
-  try {
-    const user = await getCurrentUser();
-    return user !== null && user.is_staff;
-  } catch {
-    return false;
-  }
-};
+// export const isAuthenticatedStaff = async (): Promise<boolean> => {
+//   try {
+//     const user = await getCurrentUser();
+//     return user !== null && user.is_staff;
+//   } catch {
+//     return false;
+//   }
+// };
 
-// Check if user has instructor role
-export const isInstructor = async (): Promise<boolean> => {
-  try {
-    const user = await getCurrentUser();
-    return user !== null && user.instructor !== null;
-  } catch {
-    return false;
-  }
-};
+// // Check if user has instructor role
+// export const isInstructor = async (): Promise<boolean> => {
+//   try {
+//     const user = await getCurrentUser();
+//     return user !== null && user.instructor !== null;
+//   } catch {
+//     return false;
+//   }
+// };
 
-// Check if user has student role
-export const isStudent = async (): Promise<boolean> => {
-  try {
-    const user = await getCurrentUser();
-    return user !== null && user.student !== null;
-  } catch {
-    return false;
-  }
-}; 
+// // Check if user has student role
+// export const isStudent = async (): Promise<boolean> => {
+//   try {
+//     const user = await getCurrentUser();
+//     return user !== null && user.student !== null;
+//   } catch {
+//     return false;
+//   }
+// }; 

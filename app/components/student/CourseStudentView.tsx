@@ -1,19 +1,11 @@
 'use client'
 
-import React, { useState } from 'react';
-import { Course } from '@/lib/api';
+import React, { useState, useEffect } from 'react';
+import { Course, Assignment, apiFunctions } from '@/lib/api';
 import { FaSearch } from 'react-icons/fa';
 import UploadModal from '@/app/components/UploadModal';
 import CourseSidebarStudent from '@/app/components/student/CourseSidebarStudent';
-
-interface Assignment {
-  name: string;
-  statuses: ('submitted' | 'late' | 'not_submitted' | 'graded')[];
-  score?: string;
-  timeCreated: string;
-  deadline: string;
-  hasRubric?: boolean;
-}
+import { format } from 'date-fns';
 
 interface CourseStudentViewProps {
   course: Course;
@@ -23,64 +15,45 @@ export default function CourseStudentView({ course }: CourseStudentViewProps) {
   const [activeTab, setActiveTab] = useState<'assignments' | 'gradebook'>('assignments');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAssignment, setSelectedAssignment] = useState<string | null>(null);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Hard-coded assignments data for demonstration
-  const assignments: Assignment[] = [
-    {
-      name: "Homework 1",
-      statuses: ["graded"],
-      score: "92 / 100",
-      timeCreated: "March 15 2021, 12:47 PM",
-      deadline: "March 31 2021, 11:59 PM"
-    },
-    {
-      name: "Homework 2",
-      statuses: ["submitted", "late"],
-      timeCreated: "March 15 2021, 12:47 PM",
-      deadline: "March 31 2021, 11:59 PM",
-      hasRubric: true
-    },
-    {
-      name: "Homework 3",
-      statuses: ["late"],
-      timeCreated: "March 15 2021, 12:47 PM",
-      deadline: "March 31 2021, 11:59 PM"
-    },
-    {
-      name: "Homework 4",
-      statuses: ["submitted"],
-      timeCreated: "March 15 2021, 12:47 PM",
-      deadline: "March 31 2021, 11:59 PM"
-    },
-    {
-      name: "Homework 5",
-      statuses: ["not_submitted"],
-      timeCreated: "March 15 2021, 12:47 PM",
-      deadline: "March 31 2021, 11:59 PM"
-    }
-  ];
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {
+        const data = await apiFunctions.getCourseAssignments(course.id);
+        setAssignments(data);
+      } catch (error) {
+        console.error('Error fetching assignments:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'submitted':
-        return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Submitted</span>;
-      case 'late':
-        return <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm">Late</span>;
-      case 'not_submitted':
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Not Submitted</span>;
-      default:
-        return null;
+    fetchAssignments();
+  }, [course.id]);
+
+  const getStatusBadge = (assignment: Assignment) => {
+    if (!assignment.is_visible_to_students) {
+      return null;
     }
+
+    // TODO: Add proper submission status check once API supports it
+    return (
+      <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+        Not Submitted
+      </span>
+    );
   };
 
   const handleAssignmentClick = (assignment: Assignment) => {
-    if (assignment.statuses.includes('not_submitted')) {
-      setSelectedAssignment(assignment.name);
+    if (assignment.is_visible_to_students) {
+      setSelectedAssignment(assignment.title);
     }
   };
 
   const filteredAssignments = assignments.filter(assignment =>
-    assignment.name.toLowerCase().includes(searchTerm.toLowerCase())
+    assignment.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const renderContent = () => {
@@ -111,44 +84,45 @@ export default function CourseStudentView({ course }: CourseStudentViewProps) {
               <div className="grid grid-cols-5 gap-4 p-4 border-b bg-gray-50">
                 <div className="font-semibold text-gray-600">ASSIGNMENT NAME</div>
                 <div className="font-semibold text-gray-600">STATUS</div>
-                <div className="font-semibold text-gray-600">TIME CREATED</div>
-                <div className="font-semibold text-gray-600">RUBRIC</div>
+                <div className="font-semibold text-gray-600">CREATED</div>
+                <div className="font-semibold text-gray-600">SCORING</div>
                 <div className="font-semibold text-gray-600">DEADLINE</div>
               </div>
 
-              {filteredAssignments.map((assignment, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleAssignmentClick(assignment)}
-                  className={`grid grid-cols-5 gap-4 p-4 border-b hover:bg-gray-50 ${
-                    assignment.statuses.includes('not_submitted') ? 'cursor-pointer' : ''
-                  }`}
-                >
-                  <div className="text-gray-800">{assignment.name}</div>
-                  <div className="flex items-center gap-2">
-                    {assignment.score ? (
-                      <span className="text-gray-800">{assignment.score}</span>
-                    ) : (
-                      assignment.statuses.map((status, statusIndex) => (
-                        <React.Fragment key={statusIndex}>
-                          {getStatusBadge(status)}
-                        </React.Fragment>
-                      ))
-                    )}
+              {isLoading ? (
+                <div className="p-4 text-center text-gray-600">Loading assignments...</div>
+              ) : filteredAssignments.length === 0 ? (
+                <div className="p-4 text-center text-gray-600">No assignments found</div>
+              ) : (
+                filteredAssignments.map((assignment) => (
+                  <div
+                    key={assignment.id}
+                    onClick={() => handleAssignmentClick(assignment)}
+                    className={`grid grid-cols-5 gap-4 p-4 border-b ${
+                      assignment.is_visible_to_students ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-50'
+                    }`}
+                  >
+                    <div className="text-gray-800">
+                      {assignment.title}
+                      {!assignment.is_visible_to_students && (
+                        <span className="ml-2 text-sm text-gray-500">(Not yet visible)</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getStatusBadge(assignment)}
+                    </div>
+                    <div className="text-gray-600">
+                      {format(new Date(assignment.created_at), 'MMM d, yyyy')}
+                    </div>
+                    <div className="text-gray-600">
+                      {assignment.grade_method} • {assignment.scoring_breakdown}
+                    </div>
+                    <div className="text-gray-600">
+                      {format(new Date(assignment.due_date), 'MMM d, yyyy')}
+                    </div>
                   </div>
-                  <div className="text-gray-600">{assignment.timeCreated}</div>
-                  <div>
-                    {assignment.hasRubric && (
-                      <button className="text-gray-600">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                  <div className="text-gray-600">{assignment.deadline}</div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </>
         );
