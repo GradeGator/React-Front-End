@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 
 const FeedbackPage = () => {
-  const [highlightedLine, setHighlightedLine] = useState(null);
-  const [checkedItems, setCheckedItems] = useState({});
+  const [highlightedLine, setHighlightedLine] = useState<number | null>(null);
+  const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
 
   const codeLines = [
     { line: 2, text: 'console.log("Test message");' },
@@ -21,7 +21,7 @@ const FeedbackPage = () => {
     { id: 4, line: 12, text: 'Refactor this loop to improve readability.' },
   ];
 
-  const handleCheck = (id) => {
+  const handleCheck = (id: number) => {
     setCheckedItems(prev => ({ ...prev, [id]: true }));
   };
 

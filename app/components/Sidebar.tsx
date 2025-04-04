@@ -3,9 +3,25 @@
 import { FaBook, FaCog, FaInfoCircle } from 'react-icons/fa';
 import { useUser } from '../contexts/UserContext';
 import Image from 'next/image';
+import { apiFunctions } from '../../lib/api';
 
 export default function Sidebar() {
   const { role, setRole } = useUser();
+
+  const checkAuthStatus = async () => {
+    try {
+      const response = await apiFunctions.checkAuthStatus();
+      console.log('Auth Status:', response);
+      if (!response.is_authenticated) {
+        // If not authenticated, redirect to login
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+      // On error, redirect to login
+      window.location.href = '/login';
+    }
+  };
 
   return (
     <div className="h-screen w-64 bg-white shadow-md flex flex-col justify-between">
@@ -35,6 +51,14 @@ export default function Sidebar() {
           <li className="flex items-center gap-3 cursor-pointer text-gray-600 hover:text-green-600">
             <FaInfoCircle />
             <span>Help center</span>
+          </li>
+          <li>
+            <button
+              onClick={checkAuthStatus}
+              className="w-full mt-2 p-2 text-sm bg-green-50 text-green-600 rounded hover:bg-green-100 transition-colors"
+            >
+              Test Auth Status
+            </button>
           </li>
         </ul>
 

@@ -7,16 +7,19 @@ import CourseBlock from '../components/CourseBlock';
 import CreateCourseModal from '../components/CreateCourseModal';
 import { Course } from '@/lib/api';
 import { useUser } from '../contexts/UserContext';
+import { apiFunctions } from '@/lib/api';
 
 function compareSemesters(a: string, b: string) {
-  const [seasonA, yearA] = a.split(' ');
-  const [, yearB] = b.split(' ');
+  const [termA, yearA] = a.split(' ');
+  const [termB, yearB] = b.split(' ');
 
+  // First compare years
   if (parseInt(yearA) !== parseInt(yearB)) {
     return parseInt(yearB) - parseInt(yearA); // Higher year first
   }
 
-  return seasonA === 'Fall' ? -1 : 1; // Fall before Spring in the same year
+  // Then compare terms within the same year
+  return termA === 'Fall' ? -1 : 1; // Fall before Spring in the same year
 }
 
 export default function Dashboard() {
@@ -28,80 +31,23 @@ export default function Dashboard() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        // Simulate API call with hard-coded data
-        const sampleCourses: Course[] = [
-            {
-                id: 1,
-                name: "Programming & Problem Solving",
-                number: "CSC 121",
-                term: "Spring 2025",
-                section: "A",
-                department: "Computer Science",
-                created_at: "2025-01-15",
-                updated_at: "2025-01-15"
-            },
-            {
-                id: 2,
-                name: "Data Structures",
-                number: "CSC 221",
-                term: "Spring 2025",
-                section: "B",
-                department: "Computer Science",
-                created_at: "2025-01-16",
-                updated_at: "2025-01-16"
-            },
-            {
-                id: 3,
-                name: "Computer Organization",
-                number: "CSC 250",
-                term: "Spring 2025",
-                section: "A",
-                department: "Computer Science",
-                created_at: "2025-01-17",
-                updated_at: "2025-01-17"
-            },
-            {
-                id: 4,
-                name: "Programming & Problem Solving",
-                number: "CSC 121",
-                term: "Spring 2024",
-                section: "A",
-                department: "Computer Science",
-                created_at: "2024-01-15",
-                updated_at: "2024-01-15"
-            },
-            {
-                id: 5,
-                name: "Data Structures",
-                number: "CSC 221",
-                term: "Spring 2024",
-                section: "B",
-                department: "Computer Science",
-                created_at: "2024-01-16",
-                updated_at: "2024-01-16"
-            },
-            {
-                id: 6,
-                name: "Data Structures",
-                number: "CSC 221",
-                term: "Fall 2023",
-                section: "B",
-                department: "Computer Science",
-                created_at: "2023-09-16",
-                updated_at: "2023-09-16"
-            }
-        ];
-
-        // Simulate network delay
-        setTimeout(() => {
-            setCourses(sampleCourses);
+    const fetchCourses = async () => {
+        try {
+            const fetchedCourses = await apiFunctions.getCourses();
+            setCourses(fetchedCourses);
+        } catch (error) {
+            console.error('Error fetching courses:', error);
+        } finally {
             setIsLoading(false);
-        }, 500);
+        }
+    };
+
+    useEffect(() => {
+        fetchCourses();
     }, []);
 
     const currentCourses = courses.filter(course => 
-        course.term.includes('Spring 2025')
+        course.term === 'Spring 2025'
     );
 
     const pastCourses = courses.filter(course => 
@@ -124,6 +70,10 @@ export default function Dashboard() {
             }
             return 0;
         });
+
+    const handleCourseCreated = () => {
+        fetchCourses(); // Refresh the course list
+    };
 
     if (isLoading) {
         return (
@@ -216,6 +166,7 @@ export default function Dashboard() {
                 <CreateCourseModal 
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}
+                    onCourseCreated={handleCourseCreated}
                 />
             </div>
         </div>

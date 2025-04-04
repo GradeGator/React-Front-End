@@ -6,14 +6,40 @@ const API_URL = 'http://localhost:8000/api';
 // Create axios instance
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // Important for cookie-based auth
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   }
 });
 
+// Function to get access token safely
+const getAccessToken = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('access_token');
+  }
+  return null;
+};
+
+// Add response interceptor to handle authentication errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear token and redirect to login on 401
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('access_token');
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Function to get CSRF token from cookie
 function getCsrfToken(): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
   const tokenCookieName = 'csrftoken';
   const cookies = document.cookie.split(';');
   for (const cookie of cookies) {
@@ -25,9 +51,16 @@ function getCsrfToken(): string | null {
   return null;
 }
 
-// Add request interceptor to include CSRF token in headers
+// Add request interceptor to include CSRF token and access token in headers
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Add access token if available
+    const token = getAccessToken();
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Add CSRF token for mutations
     if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method)) {
       const csrfToken = getCsrfToken();
       if (csrfToken) {
@@ -61,8 +94,35 @@ export interface CourseRequest {
   department: string;
 }
 
+export interface AuthStatus {
+  is_authenticated: boolean;
+  message?: string;
+}
+
+export interface Assignment {
+  id: number;
+  assignment_id: string;
+  title: string;
+  description: string;
+  questions: string;
+  grade_method: 'POINTS' | 'PERCENT' | 'LETTER' | 'STANDARDS';
+  scoring_breakdown: string;
+  timing: string;
+  due_date: string;
+  is_visible_to_students: boolean;
+  created_at: string;
+  updated_at: string;
+  course: number;
+}
+
 // API functions
 export const apiFunctions = {
+  // Check authentication status
+  checkAuthStatus: async (): Promise<AuthStatus> => {
+    const response = await api.get<AuthStatus>('/auth-status/');
+    return response.data;
+  },
+
   // Get all courses
   getCourses: async (): Promise<Course[]> => {
     const response = await api.get<Course[]>('/courses/');
@@ -90,24 +150,42 @@ export const apiFunctions = {
   // Delete a course
   deleteCourse: async (id: number): Promise<void> => {
     await api.delete(`/courses/${id}/`);
-  }
-};
+  },
 
-// Error handling middleware
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response) {
-      console.error('API Error:', error.response.data);
-      throw new Error(error.response.data.message || 'An error occurred');
-    } else if (error.request) {
-      console.error('Network Error:', error.request);
-      throw new Error('Network error - no response received');
-    } else {
-      console.error('Request Error:', error.message);
-      throw new Error('Error setting up the request');
-    }
-  }
-);
+  // Assignment functions
+  getAssignments: async (): Promise<Assignment[]> => {
+    const response = await api.get<Assignment[]>('/assignments/');
+    return response.data;
+  },
+
+  getAssignment: async (id: number): Promise<Assignment> => {
+    const response = await api.get<Assignment>(`/assignments/${id}/`);
+    return response.data;
+  },
+
+  createAssignment: async (assignment: Omit<Assignment, 'id' | 'created_at' | 'updated_at'>): Promise<Assignment> => {
+    const response = await api.post<Assignment>('/assignments/', assignment);
+    return response.data;
+  },
+
+  updateAssignment: async (id: number, assignment: Partial<Assignment>): Promise<Assignment> => {
+    const response = await api.patch<Assignment>(`/assignments/${id}/`, assignment);
+    return response.data;
+  },
+
+  deleteAssignment: async (id: number): Promise<void> => {
+    await api.delete(`/assignments/${id}/`);
+  },
+
+  // Get assignments for a specific course
+  getCourseAssignments: async (courseId: number): Promise<Assignment[]> => {
+    const response = await api.get<Assignment[]>('/assignments/', {
+      params: {
+        course: courseId
+      }
+    });
+    return response.data.filter(assignment => assignment.course === courseId);
+  },
+};
 
 export default api; 

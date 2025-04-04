@@ -2,7 +2,7 @@
 
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, LoginCredentials, login as authLogin, logout as authLogout, getCurrentUser } from '../auth';
+import { User, LoginCredentials, login as authLogin, logout as authLogout } from '../auth';
 
 interface AuthContextType {
   user: User | null;
@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const user = await getCurrentUser();
+      // const user = await getCurrentUser();
       setUser(user);
     } catch {
       setError('Failed to fetch user data');

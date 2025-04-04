@@ -1,21 +1,11 @@
 'use client'
 
-import React, { useState } from 'react';
-import { Course } from '@/lib/api';
+import React, { useState, useEffect } from 'react';
+import { Course, Assignment, apiFunctions } from '@/lib/api';
 import { FaSearch } from 'react-icons/fa';
 import CourseSidebarInstructor from './CourseSidebarInstructor';
 import { useRouter } from 'next/navigation';
-
-interface Assignment {
-  id: number;
-  name: string;
-  type: 'homework' | 'quiz' | 'other';
-  status: 'published' | 'draft';
-  releaseDate: string;
-  dueDate: string;
-  submissions: number;
-  gradedPercentage: number;
-}
+import { format } from 'date-fns';
 
 interface CourseInstructorViewProps {
   course: Course;
@@ -26,53 +16,35 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
   const [assignmentType, setAssignmentType] = useState<'all' | 'homework' | 'quiz' | 'others'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAssignments, setSelectedAssignments] = useState<number[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Hard-coded assignments data for demonstration
-  const assignments: Assignment[] = [
-    {
-      id: 1,
-      name: "Homework 1",
-      type: "homework",
-      status: "published",
-      releaseDate: "15 Mar 2021, 12:47 PM",
-      dueDate: "31 Mar 2021, 11:59 PM",
-      submissions: 24,
-      gradedPercentage: 75
-    },
-    {
-      id: 2,
-      name: "Quiz 1",
-      type: "quiz",
-      status: "published",
-      releaseDate: "15 Mar 2021, 12:47 PM",
-      dueDate: "31 Mar 2021, 11:59 PM",
-      submissions: 28,
-      gradedPercentage: 100
-    },
-    {
-      id: 3,
-      name: "Project Proposal",
-      type: "other",
-      status: "draft",
-      releaseDate: "15 Mar 2021, 12:47 PM",
-      dueDate: "31 Mar 2021, 11:59 PM",
-      submissions: 0,
-      gradedPercentage: 0
-    }
-  ];
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {
+        const data = await apiFunctions.getCourseAssignments(course.id);
+        setAssignments(data);
+      } catch (error) {
+        console.error('Error fetching assignments:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAssignments();
+  }, [course.id]);
 
   const filteredAssignments = assignments.filter(assignment => {
-    const matchesSearch = assignment.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTab = assignmentType === 'all' || assignment.type === assignmentType;
-    return matchesSearch && matchesTab;
+    const matchesSearch = assignment.title.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
 
   const counts = {
     all: assignments.length,
-    homework: assignments.filter(a => a.type === 'homework').length,
-    quiz: assignments.filter(a => a.type === 'quiz').length,
-    others: assignments.filter(a => a.type === 'other').length,
+    homework: assignments.filter(a => a.title.toLowerCase().includes('homework')).length,
+    quiz: assignments.filter(a => a.title.toLowerCase().includes('quiz')).length,
+    others: assignments.filter(a => !a.title.toLowerCase().includes('homework') && !a.title.toLowerCase().includes('quiz')).length,
   };
 
   const handleCheckboxChange = (assignmentId: number) => {
@@ -159,49 +131,62 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
                 </div>
                 <div className="font-semibold text-gray-600">ASSIGNMENT NAME</div>
                 <div className="font-semibold text-gray-600">STATUS</div>
-                <div className="font-semibold text-gray-600">RELEASE DATE</div>
+                <div className="font-semibold text-gray-600">CREATED</div>
                 <div className="font-semibold text-gray-600">DUE DATE</div>
-                <div className="font-semibold text-gray-600">SUBMISSION</div>
-                <div className="font-semibold text-gray-600">%GRADED</div>
+                <div className="font-semibold text-gray-600">ID</div>
+                <div className="font-semibold text-gray-600">VISIBILITY</div>
               </div>
 
-              {filteredAssignments.map((assignment) => (
-                <div
-                  key={assignment.id}
-                  className="grid grid-cols-7 gap-4 p-4 border-b hover:bg-gray-50"
-                >
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                      checked={selectedAssignments.includes(assignment.id)}
-                      onChange={() => handleCheckboxChange(assignment.id)}
-                    />
+              {isLoading ? (
+                <div className="p-4 text-center text-gray-600">Loading assignments...</div>
+              ) : filteredAssignments.length === 0 ? (
+                <div className="p-4 text-center text-gray-600">No assignments found</div>
+              ) : (
+                filteredAssignments.map((assignment) => (
+                  <div
+                    key={assignment.id}
+                    className="grid grid-cols-7 gap-4 p-4 border-b hover:bg-gray-50 cursor-pointer"
+                    onClick={() => router.push(`/assignment/${assignment.id}`)}
+                  >
+                    <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                        checked={selectedAssignments.includes(assignment.id)}
+                        onChange={() => handleCheckboxChange(assignment.id)}
+                      />
+                    </div>
+                    <div className="text-gray-800">{assignment.title}</div>
+                    <div>
+                      <span className={`px-2 py-1 rounded-full text-sm ${
+                        assignment.is_visible_to_students
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {assignment.is_visible_to_students ? 'Published' : 'Draft'}
+                      </span>
+                    </div>
+                    <div className="text-gray-600">
+                      {format(new Date(assignment.created_at), 'MMM d, yyyy')}
+                    </div>
+                    <div className="text-gray-600">
+                      {format(new Date(assignment.due_date), 'MMM d, yyyy')}
+                    </div>
+                    <div className="text-gray-600">{assignment.assignment_id}</div>
+                    <div className="text-gray-600">
+                      {assignment.is_visible_to_students ? 'Visible' : 'Hidden'}
+                    </div>
                   </div>
-                  <div className="text-gray-800">{assignment.name}</div>
-                  <div>
-                    <span className={`px-2 py-1 rounded-full text-sm ${
-                      assignment.status === 'published'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
-                    </span>
-                  </div>
-                  <div className="text-gray-600">{assignment.releaseDate}</div>
-                  <div className="text-gray-600">{assignment.dueDate}</div>
-                  <div className="text-gray-600">{assignment.submissions}</div>
-                  <div className="text-gray-600">{assignment.gradedPercentage}%</div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             <div className="fixed bottom-4 right-4">
-              <button 
-                className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center gap-2 shadow-md"
-                onClick={() => router.push(`/new-assignment?courseId=${course.id}`)}
+              <button
+                onClick={() => router.push(`/course/${course.id}/create-assignment`)}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition-colors"
               >
-                Create New Assignment
+                Create Assignment
               </button>
             </div>
           </>
@@ -233,8 +218,9 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
   return (
     <div className="flex flex-1">
       <CourseSidebarInstructor 
+        course={course}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        setActiveTab={setActiveTab}
       />
       <main className="flex-1 p-8">
         <div className="mb-8 flex justify-between items-center">

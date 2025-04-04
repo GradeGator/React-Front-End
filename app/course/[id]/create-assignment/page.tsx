@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import React, { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 
 const CreateAssignment: React.FC = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const courseId = searchParams.get('courseId');
+  const params = useParams();
+  const courseId = params.id; // Get courseId from route parameter
   
   const [assignmentName, setAssignmentName] = useState("");
   const [autoGraderPoints, setAutoGraderPoints] = useState("");
@@ -51,7 +51,7 @@ const CreateAssignment: React.FC = () => {
     };
     
     sessionStorage.setItem("assignmentData", JSON.stringify(assignmentData));
-    router.push("./configure-autograder");
+    router.push(`/course/${courseId}/configure-autograder`);
   };
 
   return (
