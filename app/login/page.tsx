@@ -99,8 +99,7 @@ const LoginPage = () => {
             <button
               type="submit"
               className="w-full bg-black text-white mt-4 py-2 rounded hover:bg-gray-800"
-            >
-              Log In
+                onClick={() => router.push("/dashboard")}>Log In
             </button>
           </form>
           <p className="text-xs text-gray-400 mt-2">

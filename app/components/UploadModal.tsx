@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -11,22 +12,18 @@ interface UploadModalProps {
 const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, assignmentName }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const router = useRouter();
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setSelectedFile(e.dataTransfer.files[0]);
     }
@@ -39,9 +36,9 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, assignmentNa
   };
 
   const handleSubmit = () => {
-    // Here you would handle the file upload to your backend
-    console.log('Uploading file:', selectedFile);
+    console.log("Uploading file:", selectedFile);
     onClose();
+    router.push("/submitted-autograder");
   };
 
   if (!isOpen) return null;
@@ -52,9 +49,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, assignmentNa
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Upload Assignment</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            ✖
           </button>
         </div>
         
@@ -62,7 +57,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, assignmentNa
         
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center ${
-            dragActive ? 'border-green-500 bg-green-50' : 'border-gray-300'
+            dragActive ? "border-green-500 bg-green-50" : "border-gray-300"
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -84,30 +79,21 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, assignmentNa
               <p className="text-gray-600 mb-2">Drag and drop your file here, or</p>
               <label className="bg-green-500 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-green-600">
                 Browse Files
-                <input
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileSelect}
-                />
+                <input type="file" className="hidden" onChange={handleFileSelect} />
               </label>
             </>
           )}
         </div>
 
         <div className="mt-6 flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
-          >
+          <button onClick={onClose} className="px-4 py-2 text-gray-600 hover:text-gray-800">
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={!selectedFile}
             className={`px-4 py-2 rounded-lg ${
-              selectedFile
-                ? 'bg-green-500 text-white hover:bg-green-600'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              selectedFile ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
             Upload
@@ -118,4 +104,4 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, assignmentNa
   );
 };
 
-export default UploadModal; 
+export default UploadModal;
