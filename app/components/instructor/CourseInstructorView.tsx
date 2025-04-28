@@ -146,7 +146,7 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
                   <div
                     key={assignment.id}
                     className="grid grid-cols-7 gap-4 p-4 border-b hover:bg-gray-50 cursor-pointer"
-                    onClick={() => router.push(`/assignment/${assignment.id}`)}
+                    onClick={() => router.push(`/course/${course.id}/assignment/${assignment.id}/submissions`)}
                   >
                     <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                       <input

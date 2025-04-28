@@ -60,6 +60,11 @@ api.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${token}`;
     }
 
+    // For FormData requests, only set Authorization header
+    if (config.data instanceof FormData) {
+      return config;
+    }
+
     // Add CSRF token for mutations
     if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method)) {
       const csrfToken = getCsrfToken();
@@ -67,6 +72,10 @@ api.interceptors.request.use(
         config.headers['X-CSRFToken'] = csrfToken;
       }
     }
+
+    // Set Content-Type for non-FormData requests
+    config.headers['Content-Type'] = 'application/json';
+    
     return config;
   },
   (error) => {
@@ -113,6 +122,20 @@ export interface Assignment {
   created_at: string;
   updated_at: string;
   course: number;
+}
+
+export interface Submission {
+  id: number;
+  submission_time: string;
+  submission_file: string;
+  student: number;
+  assignment: number;
+}
+
+export interface SubmissionRequest {
+  submission_file: File;
+  student: number;
+  assignment: number;
 }
 
 // API functions
@@ -186,6 +209,57 @@ export const apiFunctions = {
     });
     return response.data.filter(assignment => assignment.course === courseId);
   },
+
+  // Get submissions
+  getSubmissions: async (): Promise<Submission[]> => {
+    const response = await api.get<Submission[]>('/submissions/');
+    return response.data;
+  },
+
+  // Get submissions for a specific assignment
+  getAssignmentSubmissions: async (assignmentId: number): Promise<Submission[]> => {
+    const response = await api.get<Submission[]>('/submissions/', {
+      params: {
+        assignment: assignmentId
+      }
+    });
+    return response.data.filter(submission => submission.assignment === assignmentId);
+  },
+
+  // Get student details
+  getStudentDetails: async (studentId: number): Promise<any> => {
+    const response = await api.get(`/students/${studentId}/`);
+    return response.data;
+  },
+
+  // Create a new submission
+  createSubmission: async (data: SubmissionRequest): Promise<Submission> => {
+    const token = getAccessToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    const formData = new FormData();
+    formData.append('submission_file', data.submission_file);
+    formData.append('student', data.student.toString());
+    formData.append('assignment', data.assignment.toString());
+
+    try {
+      const response = await api.post<Submission>('/submissions/', formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+          console.log(`Upload Progress: ${percentCompleted}%`);
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Submission error:', error);
+      throw error;
+    }
+  }
 };
 
 export default api; 
