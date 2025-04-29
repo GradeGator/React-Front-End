@@ -14,7 +14,7 @@ interface CourseStudentViewProps {
 export default function CourseStudentView({ course }: CourseStudentViewProps) {
   const [activeTab, setActiveTab] = useState<'assignments' | 'gradebook'>('assignments');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedAssignment, setSelectedAssignment] = useState<string | null>(null);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,7 +48,7 @@ export default function CourseStudentView({ course }: CourseStudentViewProps) {
 
   const handleAssignmentClick = (assignment: Assignment) => {
     if (assignment.is_visible_to_students) {
-      setSelectedAssignment(assignment.title);
+      setSelectedAssignment(assignment);
     }
   };
 
@@ -149,7 +149,9 @@ export default function CourseStudentView({ course }: CourseStudentViewProps) {
       <UploadModal
         isOpen={!!selectedAssignment}
         onClose={() => setSelectedAssignment(null)}
-        assignmentName={selectedAssignment || ''}
+        assignmentName={selectedAssignment?.title || ''}
+        assignmentId={selectedAssignment?.id || 0}
+        studentId={1} // TODO: Replace with actual student ID from auth context
       />
     </div>
   );

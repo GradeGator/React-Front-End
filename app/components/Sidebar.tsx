@@ -4,21 +4,30 @@ import { FaBook, FaCog, FaInfoCircle } from 'react-icons/fa';
 import { useUser } from '../contexts/UserContext';
 import Image from 'next/image';
 import { apiFunctions } from '../../lib/api';
+import { useEffect, useState } from 'react';
+import type { User } from '../../lib/api';
 
 export default function Sidebar() {
   const { role, setRole } = useUser();
+  const [user, setUser] = useState<User | null>(null);
 
-  const checkAuthStatus = async () => {
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const fetchCurrentUser = async () => {
     try {
-      const response = await apiFunctions.checkAuthStatus();
-      console.log('Auth Status:', response);
-      if (!response.is_authenticated) {
-        // If not authenticated, redirect to login
-        window.location.href = '/login';
+      const userData = await apiFunctions.getCurrentUser();
+      setUser(userData);
+      
+      // Update role based on user type
+      if (userData.is_instructor) {
+        setRole('instructor');
+      } else if (userData.is_student) {
+        setRole('student');
       }
     } catch (error) {
-      console.error('Error checking auth status:', error);
-      // On error, redirect to login
+      console.error('Error fetching user data:', error);
       window.location.href = '/login';
     }
   };
@@ -52,14 +61,6 @@ export default function Sidebar() {
             <FaInfoCircle />
             <span>Help center</span>
           </li>
-          <li>
-            <button
-              onClick={checkAuthStatus}
-              className="w-full mt-2 p-2 text-sm bg-green-50 text-green-600 rounded hover:bg-green-100 transition-colors"
-            >
-              Test Auth Status
-            </button>
-          </li>
         </ul>
 
         {/* Profile */}
@@ -73,15 +74,10 @@ export default function Sidebar() {
               className="h-10 w-10 rounded-full"
             />
             <div>
-              <p className="font-medium text-gray-700">Louise Thompson</p>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value as 'student' | 'instructor')}
-                className="text-sm text-gray-500 bg-transparent border-none focus:ring-0 cursor-pointer hover:text-green-600 p-0"
-              >
-                <option value="student">Student</option>
-                <option value="instructor">Instructor</option>
-              </select>
+              <p className="font-medium text-gray-700">{user?.username || 'Loading...'}</p>
+              <p className="text-sm text-gray-500">
+                {role === 'instructor' ? 'Instructor' : 'Student'}
+              </p>
             </div>
           </div>
         </div>

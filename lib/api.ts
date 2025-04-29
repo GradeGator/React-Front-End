@@ -13,24 +13,24 @@ const api: AxiosInstance = axios.create({
 });
 
 // Function to get access token safely
-const getAccessToken = () => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('access_token');
-  }
-  return null;
-};
+// const getAccessToken = () => {
+//   if (typeof window !== 'undefined') {
+//     return localStorage.getItem('access_token');
+//   }
+//   return null;
+// };
 
 // Add response interceptor to handle authentication errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Clear token and redirect to login on 401
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('access_token');
-        window.location.href = '/login';
-      }
-    }
+    // if (error.response?.status === 401) {
+    //   // Clear token and redirect to login on 401
+    //   if (typeof window !== 'undefined') {
+    //     localStorage.removeItem('access_token');
+    //     window.location.href = '/login';
+    //   }
+    // }
     return Promise.reject(error);
   }
 );
@@ -55,10 +55,10 @@ function getCsrfToken(): string | null {
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Add access token if available
-    const token = getAccessToken();
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
+    // const token = getAccessToken();
+    // if (token) {
+    //   config.headers['Authorization'] = `Bearer ${token}`;
+    // }
 
     // Add CSRF token for mutations
     if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method)) {
@@ -113,6 +113,42 @@ export interface Assignment {
   created_at: string;
   updated_at: string;
   course: number;
+}
+
+export interface Submission {
+  id: number;
+  submission_file: string;
+  student: number;
+  assignment: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  is_staff: boolean;
+  is_student: boolean;
+  is_instructor: boolean;
+  student: {
+    id: number;
+  } | null;
+  instructor: {
+    id: number;
+  } | null;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  password_confirmation: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  preferred_name: string;
+  is_student: boolean;
+  is_instructor: boolean;
 }
 
 // API functions
@@ -185,6 +221,37 @@ export const apiFunctions = {
       }
     });
     return response.data.filter(assignment => assignment.course === courseId);
+  },
+
+  // Upload submission file
+  uploadSubmission: async (submissionData: { 
+    submission_file: File,
+    student: number,
+    assignment: number 
+  }): Promise<Submission> => {
+    const formData = new FormData();
+    formData.append('submission_file', submissionData.submission_file);
+    formData.append('student', submissionData.student.toString());
+    formData.append('assignment', submissionData.assignment.toString());
+
+    const response = await api.post<Submission>('/upload/submission/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Get current user
+  getCurrentUser: async (): Promise<User> => {
+    const response = await api.get<User>('/current-user/');
+    return response.data;
+  },
+
+  // Register a new user
+  register: async (userData: RegisterRequest): Promise<User> => {
+    const response = await api.post<User>('/register/', userData);
+    return response.data;
   },
 };
 
