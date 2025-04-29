@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { apiFunctions, Submission } from '@/lib/api';
+import { apiFunctions, Submission } from '../../../../../lib/api';
 
 interface SubmissionWithDetails extends Submission {
   studentName?: string;
@@ -11,7 +11,7 @@ interface SubmissionWithDetails extends Submission {
 
 export default function AssignmentSubmissionsPage() {
   const params = useParams();
-  const courseId = params.id;
+  const courseId = params.courseId;
   const assignmentId = params.assignmentId;
   const [submissions, setSubmissions] = useState<SubmissionWithDetails[]>([]);
   const [loading, setLoading] = useState(true);

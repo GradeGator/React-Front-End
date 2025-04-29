@@ -3,20 +3,20 @@ import { Course, apiFunctions } from '@/lib/api';
 import CourseDetailClient from './CourseDetailClient';
 
 interface PageProps {
-  params: { id: string };
+  params: { courseId: string };
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {
-  const { id } = await Promise.resolve(params);
-  const courseId = Number(id);
+  const { courseId } = params;
+  const courseIdNumber = Number(courseId);
 
-  if (isNaN(courseId)) {
-    throw new Error(`Invalid course ID: ${id}`);
+  if (isNaN(courseIdNumber)) {
+    throw new Error(`Invalid course ID: ${courseId}`);
   }
 
   try {
-    const course = await apiFunctions.getCourse(courseId);
-    return <CourseDetailClient course={course} />;
+    const course = await apiFunctions.getCourse(courseIdNumber);
+    return <CourseDetailClient course={course} assignmentData={null} />;
   } catch (error) {
     console.error('Error fetching course:', error);
     throw new Error('Failed to fetch course data');
