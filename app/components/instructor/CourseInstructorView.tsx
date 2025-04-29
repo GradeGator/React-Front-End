@@ -40,23 +40,7 @@ export default function CourseInstructorView({ course, assignmentData }: CourseI
     const fetchAssignments = async () => {
       try {
         const data = await apiFunctions.getCourseAssignments(course.id);
-        // Add hard-coded assignment
-        const hardCodedAssignment: Assignment = {
-          id: 999,
-          assignment_id: 'hard-coded-1',
-          title: 'Hard Coded Assignment',
-          description: 'This is a hard-coded assignment for testing',
-          questions: '',
-          grade_method: 'POINTS',
-          scoring_breakdown: '100 points',
-          timing: '',
-          due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-          is_visible_to_students: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          course: course.id
-        };
-        setAssignments([hardCodedAssignment, ...data]);
+        setAssignments(data);
       } catch (error) {
         console.error('Error fetching assignments:', error);
       } finally {
@@ -73,16 +57,15 @@ export default function CourseInstructorView({ course, assignmentData }: CourseI
       const newAssignment: Assignment = {
         id: Date.now(), // Temporary ID
         assignment_id: `temp-${Date.now()}`,
-        title: assignmentData.assignmentName,
-        description: '',
-        questions: '',
+        name: assignmentData.assignmentName,
         grade_method: 'POINTS',
-        scoring_breakdown: '',
-        timing: '',
+        points: parseInt(assignmentData.autoGraderPoints, 10),
         due_date: assignmentData.dueDate,
+        release_date: new Date(assignmentData.releaseDate).toISOString().split('T')[0],
         is_visible_to_students: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        is_manually_graded: false,
         course: course.id
       };
       setAssignments(prev => [...prev, newAssignment]);
@@ -90,15 +73,15 @@ export default function CourseInstructorView({ course, assignmentData }: CourseI
   }, [assignmentData, course.id]);
 
   const filteredAssignments = assignments.filter(assignment => {
-    const matchesSearch = assignment.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = assignment.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
   const counts = {
     all: assignments.length,
-    homework: assignments.filter(a => a.title.toLowerCase().includes('homework')).length,
-    quiz: assignments.filter(a => a.title.toLowerCase().includes('quiz')).length,
-    others: assignments.filter(a => !a.title.toLowerCase().includes('homework') && !a.title.toLowerCase().includes('quiz')).length,
+    homework: assignments.filter(a => a.name.toLowerCase().includes('homework')).length,
+    quiz: assignments.filter(a => a.name.toLowerCase().includes('quiz')).length,
+    others: assignments.filter(a => !a.name.toLowerCase().includes('homework') && !a.name.toLowerCase().includes('quiz')).length,
   };
 
   const handleCheckboxChange = (assignmentId: number) => {
@@ -223,7 +206,7 @@ export default function CourseInstructorView({ course, assignmentData }: CourseI
                         onChange={() => handleCheckboxChange(assignment.id)}
                       />
                     </div>
-                    <div className="text-gray-800">{assignment.title}</div>
+                    <div className="text-gray-800">{assignment.name}</div>
                     <div>
                       <span className={`px-2 py-1 rounded-full text-sm ${
                         assignment.is_visible_to_students
