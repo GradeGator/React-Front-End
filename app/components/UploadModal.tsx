@@ -84,12 +84,21 @@ export default function UploadModal({ isOpen, onClose, assignmentName, assignmen
     }
   };
 
+<<<<<<< Updated upstream
   // Show a message if user is not logged in
   useEffect(() => {
     if (isOpen && !userId) {
       setError('Please log in to submit an assignment.');
     }
   }, [isOpen, userId]);
+=======
+  const handleSubmit = () => {
+    console.log("Uploading file:", selectedFile);
+    onClose();
+    const courseId = window.location.pathname.split('/')[2];
+    router.push(`/course/${courseId}/submitted-autograder`);
+  };
+>>>>>>> Stashed changes
 
   if (!isOpen) return null;
 
