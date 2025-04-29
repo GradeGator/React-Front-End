@@ -28,6 +28,9 @@ const LoginPage = () => {
 
       if (response.user) {
         console.log("Login successful");
+        // Store user data in sessionStorage
+        sessionStorage.setItem("instructorId", response.user.id.toString());
+        sessionStorage.setItem("userData", JSON.stringify(response.user));
         router.push("/dashboard");
       }
     } catch (err: any) {

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+import { apiFunctions } from '@/lib/api';
 
 const NextPage: React.FC = () => {
   const router = useRouter();
@@ -11,12 +11,21 @@ const NextPage: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [instructorId, setInstructorId] = useState<number | null>(null);
 
-  // Load assignment data from sessionStorage (assuming it's stored from the previous page)
+  // Load assignment data and instructor ID from sessionStorage
   useEffect(() => {
     const storedData = sessionStorage.getItem("assignmentData");
+    const storedInstructorId = sessionStorage.getItem("instructorId");
+    
     if (storedData) {
-      setAssignmentData(JSON.parse(storedData));
+      const parsedData = JSON.parse(storedData);
+      setAssignmentData(parsedData);
+      console.log("Loaded assignment data:", parsedData); // Debug log
+    }
+    
+    if (storedInstructorId) {
+      setInstructorId(parseInt(storedInstructorId, 10));
     }
   }, []);
 
@@ -43,89 +52,51 @@ const NextPage: React.FC = () => {
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      setErrorMessage("Please select a ZIP file before uploading.");
+      setErrorMessage("Please select a file before uploading.");
+      return;
+    }
+
+    if (!instructorId) {
+      setErrorMessage("Instructor ID not found. Please try logging in again.");
+      return;
+    }
+
+    if (!assignmentData?.assignmentId) {
+      setErrorMessage("Assignment ID not found. Please try creating the assignment first.");
       return;
     }
 
     setIsUploading(true);
-    setUploadProgress(0);
-    
-    try {
-      // Simulate file upload with progress
-      // In a real implementation, you would use FormData and fetch with a proper API endpoint
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        setUploadProgress(i);
-      }
-      
-      // Simulate successful upload
-      console.log("File uploaded successfully:", selectedFile.name);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      setErrorMessage("Failed to upload file. Please try again.");
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleCreate = async () => {
-    if (!assignmentData) {
-      setErrorMessage("Assignment data is missing. Please go back and try again.");
-      return;
-    }
-    
-    if (!selectedFile) {
-      setErrorMessage("Please select a ZIP file before creating the assignment.");
-      return;
-    }
-
-    setIsUploading(true);
-    setUploadProgress(0);
+    setErrorMessage(null);
     
     try {
       const formData = new FormData();
-      formData.append("assignmentName", assignmentData.assignmentName);
-      formData.append("autoGraderPoints", assignmentData.autoGraderPoints);
-      formData.append("releaseDate", assignmentData.releaseDate);
-      formData.append("dueDate", assignmentData.dueDate);
-      formData.append("lateDueDate", assignmentData.lateDueDate);
-      formData.append("enableAnonymous", assignmentData.enableAnonymous);
-      formData.append("enableManual", assignmentData.enableManual);
-      formData.append("allowLateSubmissions", assignmentData.allowLateSubmissions);
-      formData.append("enableGroup", assignmentData.enableGroup);
-      formData.append("rubric", JSON.stringify(assignmentData.rubric));
-      formData.append("autograderFile", selectedFile);
+      // Make sure to use exact field names from the schema
+      formData.append('rubric_file', selectedFile);
+      formData.append('instructor', instructorId.toString());
+      formData.append('assignment', assignmentData.assignmentId.toString());
 
-      // Simulate API call with progress
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        setUploadProgress(i);
+      // Log the form data for debugging
+      console.log("Form data entries:");
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
       }
 
-      // In a real implementation, you would use:
-      // const response = await fetch("https://your-api.com/assignments", {
-      //   method: "POST",
-      //   body: formData,
-      // });
+      const response = await apiFunctions.uploadRubric(formData);
+      console.log("Upload response:", response);
       
-      // Simulate successful response
-      const response = { ok: true };
-
-      if (response.ok) {
-        alert("Assignment created successfully!");
-        // Navigate back to the course page using the courseId from sessionStorage
-        const courseId = assignmentData.courseId;
-        if (courseId) {
-          router.push(`/course/${courseId}`);
-        } else {
-          router.push("/dashboard"); // Fallback to dashboard if courseId is not available
-        }
+      // Navigate back to the course page on success
+      if (assignmentData.courseId) {
+        router.push(`/course/${assignmentData.courseId}`);
       } else {
-        setErrorMessage("Failed to create assignment. Please try again.");
+        router.push("/dashboard");
       }
-    } catch (error) {
-      console.error("Error submitting assignment:", error);
-      setErrorMessage("An error occurred while creating the assignment.");
+    } catch (error: any) {
+      console.error("Error uploading rubric:", error);
+      const errorMessage = error.response?.data?.detail || 
+                         error.response?.data?.error || 
+                         "Failed to upload rubric. Please try again.";
+      setErrorMessage(errorMessage);
     } finally {
       setIsUploading(false);
     }
@@ -133,8 +104,8 @@ const NextPage: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-2xl font-semibold mb-4">Upload Autograder</h1>
-      <p className="mb-4">Upload a ZIP file to be used as the autograder.</p>
+      <h1 className="text-2xl font-semibold mb-4">Upload Rubric</h1>
+      <p className="mb-4">Upload a grading rubric associated with this assignment.</p>
 
       <div className="mb-4">
         <input
@@ -188,17 +159,9 @@ const NextPage: React.FC = () => {
           className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-blue-300"
           disabled={!selectedFile || isUploading}
         >
-          {isUploading ? 'Uploading...' : 'Upload file'}
+          {isUploading ? 'Uploading...' : 'Upload Rubric'}
         </button>
       </div>
-
-      <button
-        onClick={handleCreate}
-        className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:bg-green-300"
-        disabled={!selectedFile || isUploading}
-      >
-        {isUploading ? 'Creating Assignment...' : 'Create Assignment'}
-      </button>
     </div>
   );
 };

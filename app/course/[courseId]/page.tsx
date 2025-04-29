@@ -7,7 +7,7 @@ interface PageProps {
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {
-  const { courseId } = params;
+  const { courseId } = await Promise.resolve(params);
   const courseIdNumber = Number(courseId);
 
   if (isNaN(courseIdNumber)) {

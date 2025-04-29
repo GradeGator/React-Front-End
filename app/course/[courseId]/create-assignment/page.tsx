@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { apiFunctions } from "@/lib/api";
 
-const CreateAssignment: React.FC = () => {
+const CreateAssignment = () => {
   const router = useRouter();
   const params = useParams();
-  const courseId = params.id; // Get courseId from route parameter
+  const courseId = params.courseId; // Get courseId from route parameter
   
   const [assignmentName, setAssignmentName] = useState("");
   const [autoGraderPoints, setAutoGraderPoints] = useState("");
@@ -60,15 +60,19 @@ const CreateAssignment: React.FC = () => {
       
       // Create the assignment object according to the API schema
       const assignmentData = {
-        assignment_id: `a${courseId}-${shortId}`, // Shorter format: 'a' + courseId + '-' + 6 chars
+        assignment_id: `a${courseId}-${shortId}`,
+        name: assignmentName,
         title: assignmentName,
         description: "Assignment created via web interface",
-        questions: "No questions provided", // Default value instead of empty string
+        questions: "No questions provided",
         grade_method: "POINTS" as const,
         scoring_breakdown: autoGraderPoints.toString(),
         timing: new Date(releaseDate).toISOString(),
+        points: parseInt(autoGraderPoints, 10),
         due_date: new Date(dueDate).toISOString(),
+        release_date: new Date(releaseDate).toISOString().split('T')[0], // Format as YYYY-MM-DD
         is_visible_to_students: true,
+        is_manually_graded: enableManual,
         course: parseInt(courseId as string, 10)
       };
 

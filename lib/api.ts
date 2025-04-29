@@ -93,16 +93,15 @@ export interface AuthStatus {
 export interface Assignment {
   id: number;
   assignment_id: string;
-  title: string;
-  description: string;
-  questions: string;
-  grade_method: 'POINTS' | 'PERCENT' | 'LETTER' | 'STANDARDS';
-  scoring_breakdown: string;
-  timing: string;
+  name: string;
+  grade_method: 'POINTS';
+  points: number;
   due_date: string;
+  release_date: string;
   is_visible_to_students: boolean;
   created_at: string;
   updated_at: string;
+  is_manually_graded: boolean;
   course: number;
 }
 
@@ -307,6 +306,12 @@ export const apiFunctions = {
     return response.data;
   },
 
+  // Upload rubric file
+  uploadRubric: async (formData: FormData): Promise<any> => {
+    // Don't set Content-Type header - let the browser set it with boundary
+    const response = await api.post('/upload/rubric/', formData);
+    return response.data;
+  },
 
   // Register a new user
   register: async (userData: RegisterRequest): Promise<User> => {

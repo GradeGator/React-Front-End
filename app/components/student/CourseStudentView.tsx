@@ -37,23 +37,7 @@ export default function CourseStudentView({ course, assignmentData }: CourseStud
     const fetchAssignments = async () => {
       try {
         const data = await apiFunctions.getCourseAssignments(course.id);
-        // Add hard-coded assignment
-        const hardCodedAssignment: Assignment = {
-          id: 999,
-          assignment_id: 'hard-coded-1',
-          title: 'Hard Coded Assignment',
-          description: 'This is a hard-coded assignment for testing',
-          questions: '',
-          grade_method: 'POINTS',
-          scoring_breakdown: '100 points',
-          timing: '',
-          due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-          is_visible_to_students: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          course: course.id
-        };
-        setAssignments([hardCodedAssignment, ...data]);
+        setAssignments(data);
       } catch (error) {
         console.error('Error fetching assignments:', error);
       } finally {
@@ -70,16 +54,15 @@ export default function CourseStudentView({ course, assignmentData }: CourseStud
       const newAssignment: Assignment = {
         id: Date.now(), // Temporary ID
         assignment_id: `temp-${Date.now()}`,
-        title: assignmentData.assignmentName,
-        description: '',
-        questions: '',
+        name: assignmentData.assignmentName,
         grade_method: 'POINTS',
-        scoring_breakdown: '',
-        timing: '',
+        points: parseInt(assignmentData.autoGraderPoints, 10),
         due_date: assignmentData.dueDate,
-        is_visible_to_students: false, // New assignments are not visible to students by default
+        release_date: new Date(assignmentData.releaseDate).toISOString().split('T')[0],
+        is_visible_to_students: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        is_manually_graded: false,
         course: course.id
       };
       setAssignments(prev => [...prev, newAssignment]);
@@ -106,7 +89,7 @@ export default function CourseStudentView({ course, assignmentData }: CourseStud
   };
 
   const filteredAssignments = assignments.filter(assignment =>
-    assignment.title.toLowerCase().includes(searchTerm.toLowerCase())
+    assignment.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const renderContent = () => {
@@ -156,7 +139,7 @@ export default function CourseStudentView({ course, assignmentData }: CourseStud
                     }`}
                   >
                     <div className="text-gray-800">
-                      {assignment.title}
+                      {assignment.name}
                       {!assignment.is_visible_to_students && (
                         <span className="ml-2 text-sm text-gray-500">(Not yet visible)</span>
                       )}
@@ -174,7 +157,7 @@ export default function CourseStudentView({ course, assignmentData }: CourseStud
                       {format(new Date(assignment.created_at), 'MMM d, yyyy')}
                     </div>
                     <div className="text-gray-600">
-                      {assignment.grade_method} • {assignment.scoring_breakdown}
+                      {assignment.grade_method} • {assignment.points} points
                     </div>
                     <div className="text-gray-600">
                       {format(new Date(assignment.due_date), 'MMM d, yyyy')}
@@ -208,7 +191,7 @@ export default function CourseStudentView({ course, assignmentData }: CourseStud
       <UploadModal
         isOpen={!!selectedAssignment}
         onClose={() => setSelectedAssignment(null)}
-        assignmentName={selectedAssignment?.title || ''}
+        assignmentName={selectedAssignment?.name || ''}
         assignmentId={selectedAssignment?.id || 0}
         courseId={course.id}
       />
