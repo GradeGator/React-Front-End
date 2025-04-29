@@ -7,11 +7,26 @@ import CourseSidebarInstructor from './CourseSidebarInstructor';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 
-interface CourseInstructorViewProps {
-  course: Course;
+interface AssignmentData {
+  assignmentName: string;
+  autoGraderPoints: string;
+  releaseDate: string;
+  dueDate: string;
+  lateDueDate: string;
+  enableAnonymous: boolean;
+  enableManual: boolean;
+  allowLateSubmissions: boolean;
+  enableGroup: boolean;
+  rubric: { description: string; points: string }[];
+  courseId: string;
 }
 
-export default function CourseInstructorView({ course }: CourseInstructorViewProps) {
+interface CourseInstructorViewProps {
+  course: Course;
+  assignmentData: AssignmentData | null;
+}
+
+export default function CourseInstructorView({ course, assignmentData }: CourseInstructorViewProps) {
   const [activeTab, setActiveTab] = useState<'assignments' | 'gradebook' | 'roster' | 'documents'>('assignments');
   const [assignmentType, setAssignmentType] = useState<'all' | 'homework' | 'quiz' | 'others'>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,7 +39,23 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
     const fetchAssignments = async () => {
       try {
         const data = await apiFunctions.getCourseAssignments(course.id);
-        setAssignments(data);
+        // Add hard-coded assignment
+        const hardCodedAssignment: Assignment = {
+          id: 999,
+          assignment_id: 'hard-coded-1',
+          title: 'Hard Coded Assignment',
+          description: 'This is a hard-coded assignment for testing',
+          questions: '',
+          grade_method: 'POINTS',
+          scoring_breakdown: '100 points',
+          timing: '',
+          due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+          is_visible_to_students: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          course: course.id
+        };
+        setAssignments([hardCodedAssignment, ...data]);
       } catch (error) {
         console.error('Error fetching assignments:', error);
       } finally {
@@ -34,6 +65,28 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
 
     fetchAssignments();
   }, [course.id]);
+
+  // If there's assignment data in sessionStorage, add it to the assignments list
+  useEffect(() => {
+    if (assignmentData) {
+      const newAssignment: Assignment = {
+        id: Date.now(), // Temporary ID
+        assignment_id: `temp-${Date.now()}`,
+        title: assignmentData.assignmentName,
+        description: '',
+        questions: '',
+        grade_method: 'POINTS',
+        scoring_breakdown: '',
+        timing: '',
+        due_date: assignmentData.dueDate,
+        is_visible_to_students: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        course: course.id
+      };
+      setAssignments(prev => [...prev, newAssignment]);
+    }
+  }, [assignmentData, course.id]);
 
   const filteredAssignments = assignments.filter(assignment => {
     const matchesSearch = assignment.title.toLowerCase().includes(searchTerm.toLowerCase());
