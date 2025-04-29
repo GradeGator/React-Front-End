@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { apiFunctions } from "@/lib/api";
 
 const CreateAssignment: React.FC = () => {
   const router = useRouter();
@@ -34,24 +35,92 @@ const CreateAssignment: React.FC = () => {
     setRubric(rubric.filter((_, i) => i !== index));
   };
 
-  const handleNext = () => {
-    // Store assignment data in sessionStorage
-    const assignmentData = {
-      assignmentName,
-      autoGraderPoints,
-      releaseDate,
-      dueDate,
-      lateDueDate,
-      enableAnonymous,
-      enableManual,
-      allowLateSubmissions,
-      enableGroup,
-      rubric,
-      courseId
-    };
-    
-    sessionStorage.setItem("assignmentData", JSON.stringify(assignmentData));
-    router.push(`/course/${courseId}/configure-autograder`);
+  const handleNext = async () => {
+    // Validate required fields
+    if (!assignmentName.trim()) {
+      alert("Please enter an assignment name");
+      return;
+    }
+    if (!autoGraderPoints) {
+      alert("Please enter autograder points");
+      return;
+    }
+    if (!releaseDate) {
+      alert("Please enter a release date");
+      return;
+    }
+    if (!dueDate) {
+      alert("Please enter a due date");
+      return;
+    }
+
+    try {
+      // Create a shorter unique assignment ID
+      const shortId = Date.now().toString(36).slice(-6); // Convert timestamp to base36 and take last 6 chars
+      
+      // Create the assignment object according to the API schema
+      const assignmentData = {
+        assignment_id: `a${courseId}-${shortId}`, // Shorter format: 'a' + courseId + '-' + 6 chars
+        title: assignmentName,
+        description: "Assignment created via web interface",
+        questions: "No questions provided", // Default value instead of empty string
+        grade_method: "POINTS" as const,
+        scoring_breakdown: autoGraderPoints.toString(),
+        timing: new Date(releaseDate).toISOString(),
+        due_date: new Date(dueDate).toISOString(),
+        is_visible_to_students: true,
+        course: parseInt(courseId as string, 10)
+      };
+
+      // Log the data being sent in a readable format
+      console.log("Sending assignment data:", JSON.stringify(assignmentData, null, 2));
+
+      // Save to backend
+      const savedAssignment = await apiFunctions.createAssignment(assignmentData);
+      console.log("Assignment created:", savedAssignment);
+
+      // Store additional data in sessionStorage for the autograder configuration
+      const configData = {
+        assignmentName,
+        autoGraderPoints,
+        releaseDate,
+        dueDate,
+        lateDueDate,
+        enableAnonymous,
+        enableManual,
+        allowLateSubmissions,
+        enableGroup,
+        rubric,
+        courseId,
+        assignmentId: savedAssignment.id
+      };
+      
+      sessionStorage.setItem("assignmentData", JSON.stringify(configData));
+      router.push(`/course/${courseId}/configure-autograder`);
+    } catch (error: any) {
+      console.error("Error creating assignment:", error);
+      
+      // More detailed error logging
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+        
+        // Show detailed error message from server if available
+        const errorMessage = error.response.data?.detail || 
+                           Object.entries(error.response.data || {}).map(([key, value]) => 
+                             `${key}: ${value}`
+                           ).join('\n');
+        
+        alert(`Failed to create assignment:\n${errorMessage}`);
+      } else if (error.request) {
+        console.error("Error request:", error.request);
+        alert("Network error - no response received from server");
+      } else {
+        console.error("Error message:", error.message);
+        alert(`Error: ${error.message}`);
+      }
+    }
   };
 
   return (

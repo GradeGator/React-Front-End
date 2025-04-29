@@ -3,21 +3,19 @@
 import { FaBook, FaCog, FaInfoCircle } from 'react-icons/fa';
 import { useUser } from '../contexts/UserContext';
 import Image from 'next/image';
-import { apiFunctions } from '../../lib/api';
 import { useEffect, useState } from 'react';
 import type { User } from '../../lib/api';
+import { useRouter } from 'next/navigation';
 
 export default function Sidebar() {
   const { role, setRole } = useUser();
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchCurrentUser();
-  }, []);
-
-  const fetchCurrentUser = async () => {
-    try {
-      const userData = await apiFunctions.getCurrentUser();
+    const storedUserData = localStorage.getItem('user_data');
+    if (storedUserData) {
+      const userData = JSON.parse(storedUserData);
       setUser(userData);
       
       // Update role based on user type
@@ -26,11 +24,11 @@ export default function Sidebar() {
       } else if (userData.is_student) {
         setRole('student');
       }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      window.location.href = '/login';
+    } else {
+      // If no user data is found, redirect to login
+      router.push('/login');
     }
-  };
+  }, [setRole, router]);
 
   return (
     <div className="h-screen w-64 bg-white shadow-md flex flex-col justify-between">
@@ -74,7 +72,7 @@ export default function Sidebar() {
               className="h-10 w-10 rounded-full"
             />
             <div>
-              <p className="font-medium text-gray-700">{user?.username || 'Loading...'}</p>
+              <p className="font-medium text-gray-700">{user?.preferred_name || user?.username || 'Loading...'}</p>
               <p className="text-sm text-gray-500">
                 {role === 'instructor' ? 'Instructor' : 'Student'}
               </p>

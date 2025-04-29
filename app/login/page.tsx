@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaGraduationCap } from "react-icons/fa";
-import api from "../../lib/api";
+import { apiFunctions } from "@/lib/api";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -19,49 +19,20 @@ const LoginPage = () => {
     setIsLoading(true);
   
     try {
-      const response = await fetch("http://localhost:8000/api/token/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          username,
-          password
-        })
-      });
-  
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          setError("Invalid username or password");
-        } else {
-          setError(data.detail || "Login failed. Please try again.");
-        }
+      const response = await apiFunctions.login({ username, password });
+      
+      if (!response.success) {
+        setError("Invalid username or password");
         return;
       }
-  
-      const { access, refresh } = data;
-  
-      // Store tokens
-      localStorage.setItem("access_token", access);
-      localStorage.setItem("refresh_token", refresh);
-  
-      // Set the default Authorization header for future requests
-      api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-  
-      // Fetch user data after successful login
-      const userResponse = await api.get('/current-user/');
-      const userData = userResponse.data;
 
-      // Store user role information
-      localStorage.setItem("user_data", JSON.stringify(userData));
-  
-      console.log("Login successful");
-      router.push("/dashboard");
-    } catch (err) {
+      if (response.user) {
+        console.log("Login successful");
+        router.push("/dashboard");
+      }
+    } catch (err: any) {
       console.error("Error logging in:", err);
-      setError("Something went wrong. Please try again.");
+      setError(err.response?.data?.error?.[0] || "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }

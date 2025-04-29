@@ -104,8 +104,10 @@ export default function Dashboard() {
                                 className="cursor-pointer"
                             >
                                 <CourseBlock
-                                    courseId={course.number}
+                                    courseId={course.id}
                                     courseName={course.name}
+                                    courseNumber={course.number}
+                                    section={course.section}
                                     semester={course.term}
                                 />
                             </div>
@@ -143,8 +145,10 @@ export default function Dashboard() {
                                 className="cursor-pointer"
                             >
                                 <CourseBlock
-                                    courseId={course.number}
+                                    courseId={course.id}
                                     courseName={course.name}
+                                    courseNumber={course.number}
+                                    section={course.section}
                                     semester={course.term}
                                 />
                             </div>

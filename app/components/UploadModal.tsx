@@ -1,234 +1,160 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { apiFunctions } from "@/lib/api";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { apiFunctions } from '@/lib/api';
 
 interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   assignmentName: string;
   assignmentId: number;
-  studentId: number;
+  courseId: number;
 }
 
-const UploadModal: React.FC<UploadModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  assignmentName,
-  assignmentId,
-  studentId
-}) => {
-  const [dragActive, setDragActive] = useState(false);
+export default function UploadModal({ isOpen, onClose, assignmentName, assignmentId, courseId }: UploadModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(e.type === "dragenter" || e.type === "dragover");
-  };
+  // Safely access localStorage on the client side
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    setUserId(storedUserId);
+  }, []);
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      validateAndSetFile(file);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setError(null);
     }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      validateAndSetFile(e.target.files[0]);
-    }
-  };
-
-  const validateAndSetFile = (file: File) => {
-    setError(null);
-    // Add file validation here if needed (size, type, etc.)
-    const maxSize = 50 * 1024 * 1024; // 50MB max size
-    if (file.size > maxSize) {
-      setError("File size must be less than 50MB");
-      return;
-    }
-    setSelectedFile(file);
   };
 
   const handleSubmit = async () => {
-    if (!selectedFile) return;
-    
-    setIsUploading(true);
+    if (!selectedFile) {
+      setError('Please select a file to upload');
+      return;
+    }
+
+    if (!userId) {
+      setError('You must be logged in to submit an assignment. Please log in and try again.');
+      return;
+    }
+
+    setUploading(true);
     setError(null);
 
     try {
-      console.log('Starting file upload with data:', {
-        fileName: selectedFile.name,
-        fileSize: selectedFile.size,
-        fileType: selectedFile.type,
-        studentId,
-        assignmentId
-      });
-
-      await apiFunctions.uploadSubmission({
+      // Create submission request
+      const submissionRequest = {
         submission_file: selectedFile,
-        student: studentId,
+        student: parseInt(userId),
         assignment: assignmentId
-      });
+      };
+
+      // Submit the file
+      const response = await apiFunctions.createSubmission(submissionRequest);
+      console.log('Upload response:', response);
       
-      console.log('File upload completed successfully');
       onClose();
-      router.refresh();
-    } catch (error: unknown) {
-      // Type guard for axios error
-      interface AxiosError {
-        response?: {
-          status?: number;
-          data?: {
-            detail?: string;
-            error?: string;
-            message?: string;
-          };
-        };
-        message?: string;
-        name?: string;
-        code?: string;
-      }
-
-      const err = error as Error & AxiosError;
+      router.push(`/course/${courseId}/submitted-autograder`);
+    } catch (error: any) {
+      console.error('Error uploading file:', error);
+      console.error('Error details:', error);
       
-      // Log each piece of error information separately
-      console.error('Upload Error:');
-      console.error('- Name:', err.name);
-      console.error('- Message:', err.message);
-      console.error('- Status:', err.response?.status);
-      console.error('- Response Data:', JSON.stringify(err.response?.data, null, 2));
-      
-      if (err.code) {
-        console.error('- Error Code:', err.code);
-      }
-
-      // Try to log the full error in a safe way
-      try {
-        console.error('- Full Error:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
-      } catch (jsonError) {
-        console.error('- Could not stringify full error object');
-      }
-      
-      // Set a more descriptive error message based on the error type
-      let errorMessage = 'Failed to upload submission. ';
-      if (err.response?.status === 413) {
-        errorMessage += 'File size too large.';
-      } else if (err.response?.status === 415) {
-        errorMessage += 'Invalid file type.';
-      } else if (err.response?.status === 401) {
-        errorMessage += 'Please log in again.';
-      } else if (err.response?.data?.error) {
-        errorMessage += err.response.data.error;
-      } else if (err.response?.data?.detail) {
-        errorMessage += err.response.data.detail;
-      } else if (err.response?.data?.message) {
-        errorMessage += err.response.data.message;
-      } else if (err.message) {
-        errorMessage += err.message;
+      let errorMessage = 'Failed to upload file. ';
+      if (error.response?.data?.detail) {
+        errorMessage += error.response.data.detail;
+      } else if (error.response?.data) {
+        // If there are field-specific errors
+        const fieldErrors = Object.entries(error.response.data)
+          .map(([field, message]) => `${field}: ${message}`)
+          .join(', ');
+        errorMessage += fieldErrors;
       } else {
         errorMessage += 'Please try again.';
       }
       
       setError(errorMessage);
     } finally {
-      setIsUploading(false);
+      setUploading(false);
     }
   };
+
+  // Show a message if user is not logged in
+  useEffect(() => {
+    if (isOpen && !userId) {
+      setError('Please log in to submit an assignment.');
+    }
+  }, [isOpen, userId]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-[500px]">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Upload Assignment</h2>
-          <button 
-            onClick={onClose} 
-            className="text-gray-500 hover:text-gray-700"
-            disabled={isUploading}
-          >
-            ✖
-          </button>
-        </div>
-        
-        <p className="text-gray-600 mb-4">{assignmentName}</p>
-        
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
-        
-        <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center ${
-            dragActive ? "border-green-500 bg-green-50" : "border-gray-300"
-          }`}
-          onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
-        >
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <h2 className="text-xl font-semibold mb-4">Upload Assignment</h2>
+        <p className="text-gray-600 mb-4">Uploading for: {assignmentName}</p>
+
+        <div className="border-2 rounded-lg p-6 text-center">
           {selectedFile ? (
-            <div className="space-y-2">
+            <div className="mb-4">
               <p className="text-green-600">Selected file: {selectedFile.name}</p>
-              <button
+              <button 
                 onClick={() => setSelectedFile(null)}
-                className="text-red-500 hover:text-red-700 text-sm"
-                disabled={isUploading}
+                className="text-sm text-red-500 hover:text-red-700 mt-2"
               >
                 Remove
               </button>
             </div>
           ) : (
-            <>
-              <p className="text-gray-600 mb-2">Drag and drop your file here, or</p>
-              <label className={`bg-green-500 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-green-600 ${
-                isUploading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}>
-                Browse Files
-                <input 
-                  type="file" 
-                  className="hidden" 
-                  onChange={handleFileSelect}
-                  disabled={isUploading}
-                />
-              </label>
-            </>
+            <div className="mb-4">
+              <p className="text-gray-600">Select a file to upload</p>
+              <p className="text-sm text-gray-500 mt-1">Supported formats: PDF, TXT, ZIP</p>
+            </div>
           )}
+          
+          <input
+            type="file"
+            accept=".pdf,.txt,.zip"
+            onChange={handleFileChange}
+            className="block w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-green-50 file:text-green-700
+              hover:file:bg-green-100"
+          />
         </div>
 
+        {error && (
+          <p className="text-red-500 text-sm mt-2">{error}</p>
+        )}
+
         <div className="mt-6 flex justify-end gap-3">
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="px-4 py-2 text-gray-600 hover:text-gray-800"
-            disabled={isUploading}
+            disabled={uploading}
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!selectedFile || isUploading}
+            disabled={!selectedFile || uploading || !userId}
             className={`px-4 py-2 rounded-lg ${
-              selectedFile && !isUploading 
-                ? "bg-green-500 text-white hover:bg-green-600" 
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
+              !selectedFile || uploading || !userId
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700'
+            } text-white`}
           >
-            {isUploading ? "Uploading..." : "Upload"}
+            {uploading ? 'Uploading...' : 'Submit'}
           </button>
         </div>
       </div>
     </div>
   );
-};
-
-export default UploadModal;
+}

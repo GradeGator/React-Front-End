@@ -151,7 +151,7 @@ export default function CourseStudentView({ course }: CourseStudentViewProps) {
         onClose={() => setSelectedAssignment(null)}
         assignmentName={selectedAssignment?.title || ''}
         assignmentId={selectedAssignment?.id || 0}
-        studentId={1} // TODO: Replace with actual student ID from auth context
+        courseId={course.id}
       />
     </div>
   );
