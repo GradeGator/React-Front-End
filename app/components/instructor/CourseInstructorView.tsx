@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Course, Assignment, apiFunctions } from '@/lib/api';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaTrash } from 'react-icons/fa';
 import CourseSidebarInstructor from './CourseSidebarInstructor';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
@@ -18,6 +18,7 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
   const [selectedAssignments, setSelectedAssignments] = useState<number[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<Assignment | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -53,6 +54,18 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
         ? prev.filter(id => id !== assignmentId)
         : [...prev, assignmentId]
     );
+  };
+
+  const handleDeleteAssignment = async (assignment: Assignment) => {
+    try {
+      await apiFunctions.deleteAssignment(assignment.id);
+      // Remove the deleted assignment from the state
+      setAssignments(prev => prev.filter(a => a.id !== assignment.id));
+      setAssignmentToDelete(null);
+    } catch (error) {
+      console.error('Error deleting assignment:', error);
+      alert('Failed to delete assignment. Please try again.');
+    }
   };
 
   const renderContent = () => {
@@ -112,7 +125,7 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
             </div>
 
             <div className="bg-white rounded-lg shadow">
-              <div className="grid grid-cols-7 gap-4 p-4 border-b bg-gray-50">
+              <div className="grid grid-cols-8 gap-4 p-4 border-b bg-gray-50">
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -135,6 +148,7 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
                 <div className="font-semibold text-gray-600">DUE DATE</div>
                 <div className="font-semibold text-gray-600">ID</div>
                 <div className="font-semibold text-gray-600">VISIBILITY</div>
+                <div className="font-semibold text-gray-600">ACTIONS</div>
               </div>
 
               {isLoading ? (
@@ -145,7 +159,7 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
                 filteredAssignments.map((assignment) => (
                   <div
                     key={assignment.id}
-                    className="grid grid-cols-7 gap-4 p-4 border-b hover:bg-gray-50 cursor-pointer"
+                    className="grid grid-cols-8 gap-4 p-4 border-b hover:bg-gray-50 cursor-pointer"
                     onClick={() => router.push(`/course/${course.id}/assignment/${assignment.id}/submissions`)}
                   >
                     <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
@@ -175,6 +189,15 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
                     <div className="text-gray-600">{assignment.assignment_id}</div>
                     <div className="text-gray-600">
                       {assignment.is_visible_to_students ? 'Visible' : 'Hidden'}
+                    </div>
+                    <div className="text-gray-600" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => setAssignmentToDelete(assignment)}
+                        className="text-gray-500 hover:text-red-600 transition-colors"
+                        aria-label="Delete Assignment"
+                      >
+                        <FaTrash />
+                      </button>
                     </div>
                   </div>
                 ))
@@ -246,6 +269,30 @@ export default function CourseInstructorView({ course }: CourseInstructorViewPro
 
         {renderContent()}
       </main>
+
+      {/* Delete Confirmation Modal */}
+      {assignmentToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-xl font-semibold mb-4">Delete Assignment</h3>
+            <p className="mb-6">Are you sure you want to delete this assignment?</p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setAssignmentToDelete(null)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteAssignment(assignmentToDelete)}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
