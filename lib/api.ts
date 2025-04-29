@@ -3,37 +3,22 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 // Base URL for all API requests
 const API_URL = 'http://localhost:8000/api';
 
-// Create axios instance
+// Create axios instance with credentials support
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
+  withCredentials: true, // This is crucial for sending/receiving cookies
   headers: {
     'Content-Type': 'application/json',
   }
 });
 
 // Function to get access token safely
-const getAccessToken = () => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('access_token');
-  }
-  return null;
-};
-
-// Add response interceptor to handle authentication errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Clear token and redirect to login on 401
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('access_token');
-        window.location.href = '/login';
-      }
-    }
-    return Promise.reject(error);
-  }
-);
+// const getAccessToken = () => {
+//   if (typeof window !== 'undefined') {
+//     return localStorage.getItem('access_token');
+//   }
+//   return null;
+// };
 
 // Function to get CSRF token from cookie
 function getCsrfToken(): string | null {
@@ -51,20 +36,9 @@ function getCsrfToken(): string | null {
   return null;
 }
 
-// Add request interceptor to include CSRF token and access token in headers
+// Add request interceptor to include CSRF token
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Add access token if available
-    const token = getAccessToken();
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    // For FormData requests, only set Authorization header
-    if (config.data instanceof FormData) {
-      return config;
-    }
-
     // Add CSRF token for mutations
     if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method)) {
       const csrfToken = getCsrfToken();
@@ -73,12 +47,20 @@ api.interceptors.request.use(
       }
     }
 
-    // Set Content-Type for non-FormData requests
-    config.headers['Content-Type'] = 'application/json';
-    
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle authentication errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 403) {
+      console.error('CSRF token validation failed');
+    }
     return Promise.reject(error);
   }
 );
@@ -126,6 +108,38 @@ export interface Assignment {
 
 export interface Submission {
   id: number;
+  submission_file: string;
+  student: number;
+  assignment: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  is_student: boolean;
+  is_instructor: boolean;
+  student_id: string;
+  instructor_id: string;
+  preferred_name: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  password_confirmation: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  preferred_name: string;
+  is_student: boolean;
+  is_instructor: boolean;
+}
+
+export interface Submission {
+  id: number;
   submission_time: string;
   submission_file: string;
   student: number;
@@ -136,6 +150,27 @@ export interface SubmissionRequest {
   submission_file: File;
   student: number;
   assignment: number;
+}
+
+export interface LoginRequest {
+  email: string;
+  username: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  user?: {
+    id: number;
+    username: string;
+    email: string;
+    is_student: boolean;
+    is_instructor: boolean;
+    student_id: string;
+    instructor_id: string;
+    preferred_name: string;
+  };
+  error?: [];
 }
 
 // API functions
@@ -234,11 +269,6 @@ export const apiFunctions = {
 
   // Create a new submission
   createSubmission: async (data: SubmissionRequest): Promise<Submission> => {
-    const token = getAccessToken();
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-
     const formData = new FormData();
     formData.append('submission_file', data.submission_file);
     formData.append('student', data.student.toString());
@@ -246,9 +276,6 @@ export const apiFunctions = {
 
     try {
       const response = await api.post<Submission>('/submissions/', formData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
           console.log(`Upload Progress: ${percentCompleted}%`);
@@ -259,7 +286,47 @@ export const apiFunctions = {
       console.error('Submission error:', error);
       throw error;
     }
-  }
+  },
+
+  // Upload submission file
+  uploadSubmission: async (submissionData: { 
+    submission_file: File,
+    student: number,
+    assignment: number 
+  }): Promise<Submission> => {
+    const formData = new FormData();
+    formData.append('submission_file', submissionData.submission_file);
+    formData.append('student', submissionData.student.toString());
+    formData.append('assignment', submissionData.assignment.toString());
+
+    const response = await api.post<Submission>('/upload/submission/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+
+  // Register a new user
+  register: async (userData: RegisterRequest): Promise<User> => {
+    const response = await api.post<User>('/register/', userData);
+    return response.data;
+  },
+
+  // Login user
+  login: async (credentials: Partial<LoginRequest>): Promise<LoginResponse> => {
+    const response = await api.post<LoginResponse>('/login/', credentials);
+    
+    if (response.data.success && response.data.user) {
+      // Store user data
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user_data', JSON.stringify(response.data.user));
+      }
+    }
+    
+    return response.data;
+  },
 };
 
 export default api; 

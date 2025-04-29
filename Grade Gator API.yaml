@@ -11,9 +11,9 @@ paths:
       tags:
       - assignments
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -41,9 +41,9 @@ paths:
               $ref: '#/components/schemas/AssignmentRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '201':
           content:
@@ -65,9 +65,9 @@ paths:
       tags:
       - assignments
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -100,9 +100,9 @@ paths:
               $ref: '#/components/schemas/AssignmentRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -134,9 +134,9 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedAssignmentRequest'
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -157,9 +157,9 @@ paths:
       tags:
       - assignments
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '204':
           description: No response body
@@ -170,7 +170,6 @@ paths:
       tags:
       - auth-status
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
       - {}
@@ -188,7 +187,6 @@ paths:
       tags:
       - courses
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
       responses:
@@ -218,7 +216,6 @@ paths:
               $ref: '#/components/schemas/CourseRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
       responses:
@@ -242,7 +239,6 @@ paths:
       tags:
       - courses
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
       responses:
@@ -277,7 +273,6 @@ paths:
               $ref: '#/components/schemas/CourseRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
       responses:
@@ -311,7 +306,6 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedCourseRequest'
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
       responses:
@@ -334,7 +328,6 @@ paths:
       tags:
       - courses
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
       responses:
@@ -347,7 +340,6 @@ paths:
       tags:
       - current-user
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
       responses:
@@ -379,9 +371,9 @@ paths:
       tags:
       - feedback
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -409,9 +401,9 @@ paths:
               $ref: '#/components/schemas/FeedbackRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '201':
           content:
@@ -433,9 +425,9 @@ paths:
       tags:
       - feedback
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -468,9 +460,9 @@ paths:
               $ref: '#/components/schemas/FeedbackRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -502,9 +494,9 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedFeedbackRequest'
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -525,9 +517,9 @@ paths:
       tags:
       - feedback
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '204':
           description: No response body
@@ -538,9 +530,9 @@ paths:
       tags:
       - grades
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -568,9 +560,9 @@ paths:
               $ref: '#/components/schemas/GradeRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '201':
           content:
@@ -592,9 +584,9 @@ paths:
       tags:
       - grades
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -627,9 +619,9 @@ paths:
               $ref: '#/components/schemas/GradeRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -661,9 +653,9 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedGradeRequest'
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -684,9 +676,9 @@ paths:
       tags:
       - grades
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '204':
           description: No response body
@@ -697,9 +689,9 @@ paths:
       tags:
       - instructors
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -727,9 +719,9 @@ paths:
               $ref: '#/components/schemas/InstructorRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '201':
           content:
@@ -751,9 +743,9 @@ paths:
       tags:
       - instructors
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -786,9 +778,9 @@ paths:
               $ref: '#/components/schemas/InstructorRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -820,9 +812,9 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedInstructorRequest'
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -843,12 +835,366 @@ paths:
       tags:
       - instructors
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '204':
           description: No response body
+  /api/register/:
+    get:
+      operationId: register_list
+      description: List all submissions
+      tags:
+      - register
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    student:
+                      type: integer
+                    assignment:
+                      type: integer
+                    submission_time:
+                      type: string
+                      format: date-time
+                    files:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          file:
+                            type: string
+                            format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+    post:
+      operationId: register_create
+      description: Register a new user account. Only email and password are required
+        fields.
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                password_confirmation:
+                  type: string
+                  format: password
+                username:
+                  type: string
+                  description: Optional. If not provided, will be generated from email
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                preferred_name:
+                  type: string
+                  description: Optional display name
+                is_student:
+                  type: boolean
+                  default: false
+                is_instructor:
+                  type: boolean
+                  default: false
+              required:
+              - email
+              - password
+              - password_confirmation
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  detail:
+                    type: object
+          description: ''
+  /api/register/{id}/:
+    get:
+      operationId: register_retrieve
+      description: Get details of a specific submission
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this submission.
+        required: true
+      tags:
+      - register
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  student:
+                    type: integer
+                  assignment:
+                    type: integer
+                  submission_time:
+                    type: string
+                    format: date-time
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+    put:
+      operationId: register_update
+      description: Update an existing submission
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this submission.
+        required: true
+      tags:
+      - register
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                student:
+                  type: integer
+                  description: ID of the student uploading the submission
+                assignment:
+                  type: integer
+                  description: ID of the related assignment
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: List of files to upload
+              required:
+              - student
+              - assignment
+              - files
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  student:
+                    type: integer
+                  assignment:
+                    type: integer
+                  submission_time:
+                    type: string
+                    format: date-time
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+    patch:
+      operationId: register_partial_update
+      description: Partially update an existing submission
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this submission.
+        required: true
+      tags:
+      - register
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                student:
+                  type: integer
+                  description: ID of the student uploading the submission
+                assignment:
+                  type: integer
+                  description: ID of the related assignment
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: List of files to upload
+              required:
+              - student
+              - assignment
+              - files
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  student:
+                    type: integer
+                  assignment:
+                    type: integer
+                  submission_time:
+                    type: string
+                    format: date-time
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+    delete:
+      operationId: register_destroy
+      description: Delete a submission
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this submission.
+        required: true
+      tags:
+      - register
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  student:
+                    type: integer
+                  assignment:
+                    type: integer
+                  submission_time:
+                    type: string
+                    format: date-time
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
   /api/students/:
     get:
       operationId: students_list
@@ -856,9 +1202,9 @@ paths:
       tags:
       - students
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -886,9 +1232,9 @@ paths:
               $ref: '#/components/schemas/StudentRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '201':
           content:
@@ -910,9 +1256,9 @@ paths:
       tags:
       - students
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -945,9 +1291,9 @@ paths:
               $ref: '#/components/schemas/StudentRequest'
         required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -979,9 +1325,9 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedStudentRequest'
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -1002,9 +1348,9 @@ paths:
       tags:
       - students
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '204':
           description: No response body
@@ -1015,17 +1361,44 @@ paths:
       tags:
       - submissions
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Submission'
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    student:
+                      type: integer
+                    assignment:
+                      type: integer
+                    submission_time:
+                      type: string
+                      format: date-time
+                    files:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          file:
+                            type: string
+                            format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
           description: ''
     post:
       operationId: submissions_create
@@ -1034,26 +1407,63 @@ paths:
       - submissions
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubmissionRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/SubmissionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SubmissionRequest'
-        required: true
+              type: object
+              properties:
+                student:
+                  type: integer
+                  description: ID of the student uploading the submission
+                assignment:
+                  type: integer
+                  description: ID of the related assignment
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: List of files to upload
+              required:
+              - student
+              - assignment
+              - files
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Submission'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  student:
+                    type: integer
+                  assignment:
+                    type: integer
+                  submission_time:
+                    type: string
+                    format: date-time
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
           description: ''
   /api/submissions/{id}/:
     get:
@@ -1069,15 +1479,42 @@ paths:
       tags:
       - submissions
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Submission'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  student:
+                    type: integer
+                  assignment:
+                    type: integer
+                  submission_time:
+                    type: string
+                    format: date-time
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
           description: ''
     put:
       operationId: submissions_update
@@ -1093,26 +1530,63 @@ paths:
       - submissions
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubmissionRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/SubmissionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SubmissionRequest'
-        required: true
+              type: object
+              properties:
+                student:
+                  type: integer
+                  description: ID of the student uploading the submission
+                assignment:
+                  type: integer
+                  description: ID of the related assignment
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: List of files to upload
+              required:
+              - student
+              - assignment
+              - files
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Submission'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  student:
+                    type: integer
+                  assignment:
+                    type: integer
+                  submission_time:
+                    type: string
+                    format: date-time
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
           description: ''
     patch:
       operationId: submissions_partial_update
@@ -1128,25 +1602,63 @@ paths:
       - submissions
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedSubmissionRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedSubmissionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedSubmissionRequest'
+              type: object
+              properties:
+                student:
+                  type: integer
+                  description: ID of the student uploading the submission
+                assignment:
+                  type: integer
+                  description: ID of the related assignment
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: List of files to upload
+              required:
+              - student
+              - assignment
+              - files
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Submission'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  student:
+                    type: integer
+                  assignment:
+                    type: integer
+                  submission_time:
+                    type: string
+                    format: date-time
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          format: uri
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
           description: ''
     delete:
       operationId: submissions_destroy
@@ -1161,119 +1673,93 @@ paths:
       tags:
       - submissions
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
-      responses:
-        '204':
-          description: No response body
-  /api/token/:
-    post:
-      operationId: token_create
-      description: |-
-        Takes a set of user credentials and returns an access and refresh JSON web
-        token pair to prove the authentication of those credentials.
-      tags:
-      - token
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TokenObtainPairRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/TokenObtainPairRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/TokenObtainPairRequest'
-        required: true
-      security:
       - {}
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenObtainPair'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  student:
+                    type: integer
+                  assignment:
+                    type: integer
+                  submission_time:
+                    type: string
+                    format: date-time
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          format: uri
           description: ''
-  /api/token/refresh/:
-    post:
-      operationId: token_refresh_create
-      description: |-
-        Takes a refresh type JSON web token and returns an access type JSON web
-        token if the refresh token is valid.
-      tags:
-      - token
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TokenRefreshRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/TokenRefreshRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/TokenRefreshRequest'
-        required: true
-      security:
-      - {}
-      responses:
-        '200':
+        '400':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenRefresh'
+                type: object
+                properties:
+                  error:
+                    type: string
           description: ''
-  /api/token/verify/:
-    post:
-      operationId: token_verify_create
-      description: |-
-        Takes a token and indicates if it is valid.  This view provides no
-        information about a token's fitness for a particular use.
-      tags:
-      - token
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TokenVerifyRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/TokenVerifyRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/TokenVerifyRequest'
-        required: true
-      security:
-      - {}
-      responses:
-        '200':
-          description: No response body
   /api/upload/rubric/:
     post:
       operationId: upload_rubric_create
       tags:
       - upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GradingRubricRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GradingRubricRequest'
+        required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradingRubric'
+          description: ''
   /api/upload/submission/:
     post:
       operationId: upload_submission_create
       tags:
       - upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmissionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmissionRequest'
+        required: true
       security:
-      - jwtAuth: []
       - cookieAuth: []
       - tokenAuth: []
+      - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+          description: ''
 components:
   schemas:
     Assignment:
@@ -1285,23 +1771,23 @@ components:
         assignment_id:
           type: string
           maxLength: 20
-        title:
+        name:
           type: string
           maxLength: 200
-        description:
-          type: string
-        questions:
-          type: string
         grade_method:
-          $ref: '#/components/schemas/GradeMethodEnum'
-        scoring_breakdown:
-          type: string
-        timing:
-          type: string
-          maxLength: 50
+          oneOf:
+          - $ref: '#/components/schemas/GradeMethodEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
         due_date:
           type: string
           format: date-time
+        release_date:
+          type: string
+          format: date
         is_visible_to_students:
           type: boolean
         created_at:
@@ -1312,19 +1798,19 @@ components:
           type: string
           format: date-time
           readOnly: true
+        is_manually_graded:
+          type: boolean
         course:
           type: integer
       required:
       - assignment_id
       - course
       - created_at
-      - description
       - due_date
       - id
-      - questions
-      - scoring_breakdown
-      - timing
-      - title
+      - name
+      - points
+      - release_date
       - updated_at
     AssignmentRequest:
       type: object
@@ -1333,41 +1819,37 @@ components:
           type: string
           minLength: 1
           maxLength: 20
-        title:
+        name:
           type: string
           minLength: 1
           maxLength: 200
-        description:
-          type: string
-          minLength: 1
-        questions:
-          type: string
-          minLength: 1
         grade_method:
-          $ref: '#/components/schemas/GradeMethodEnum'
-        scoring_breakdown:
-          type: string
-          minLength: 1
-        timing:
-          type: string
-          minLength: 1
-          maxLength: 50
+          oneOf:
+          - $ref: '#/components/schemas/GradeMethodEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
         due_date:
           type: string
           format: date-time
+        release_date:
+          type: string
+          format: date
         is_visible_to_students:
+          type: boolean
+        is_manually_graded:
           type: boolean
         course:
           type: integer
       required:
       - assignment_id
       - course
-      - description
       - due_date
-      - questions
-      - scoring_breakdown
-      - timing
-      - title
+      - name
+      - points
+      - release_date
     AuthStatus:
       type: object
       description: Serializer for authentication status responses
@@ -1380,6 +1862,9 @@ components:
           nullable: true
       required:
       - is_authenticated
+    BlankEnum:
+      enum:
+      - ''
     Course:
       type: object
       properties:
@@ -1409,10 +1894,15 @@ components:
           type: string
           format: date-time
           readOnly: true
+        active:
+          type: boolean
+        instructor:
+          type: integer
       required:
       - created_at
       - department
       - id
+      - instructor
       - name
       - number
       - section
@@ -1441,8 +1931,13 @@ components:
           type: string
           minLength: 1
           maxLength: 100
+        active:
+          type: boolean
+        instructor:
+          type: integer
       required:
       - department
+      - instructor
       - name
       - number
       - section
@@ -1551,6 +2046,43 @@ components:
           nullable: true
       required:
       - submission
+    GradingRubric:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        submission_time:
+          type: string
+          format: date-time
+          readOnly: true
+        rubric_file:
+          type: string
+          format: uri
+          nullable: true
+        instructor:
+          type: integer
+        assignment:
+          type: integer
+      required:
+      - assignment
+      - id
+      - instructor
+      - submission_time
+    GradingRubricRequest:
+      type: object
+      properties:
+        rubric_file:
+          type: string
+          format: binary
+          nullable: true
+        instructor:
+          type: integer
+        assignment:
+          type: integer
+      required:
+      - assignment
+      - instructor
     Instructor:
       type: object
       properties:
@@ -1621,29 +2153,27 @@ components:
           type: string
           minLength: 1
           maxLength: 20
-        title:
+        name:
           type: string
           minLength: 1
           maxLength: 200
-        description:
-          type: string
-          minLength: 1
-        questions:
-          type: string
-          minLength: 1
         grade_method:
-          $ref: '#/components/schemas/GradeMethodEnum'
-        scoring_breakdown:
-          type: string
-          minLength: 1
-        timing:
-          type: string
-          minLength: 1
-          maxLength: 50
+          oneOf:
+          - $ref: '#/components/schemas/GradeMethodEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
         due_date:
           type: string
           format: date-time
+        release_date:
+          type: string
+          format: date
         is_visible_to_students:
+          type: boolean
+        is_manually_graded:
           type: boolean
         course:
           type: integer
@@ -1670,6 +2200,10 @@ components:
           type: string
           minLength: 1
           maxLength: 100
+        active:
+          type: boolean
+        instructor:
+          type: integer
     PatchedFeedbackRequest:
       type: object
       properties:
@@ -1743,9 +2277,6 @@ components:
           type: string
           nullable: true
           maxLength: 200
-        accommodations:
-          type: string
-          nullable: true
         user:
           type: integer
           nullable: true
@@ -1753,17 +2284,6 @@ components:
           type: array
           items:
             type: integer
-    PatchedSubmissionRequest:
-      type: object
-      properties:
-        submission_file:
-          type: string
-          format: binary
-          nullable: true
-        student:
-          type: integer
-        assignment:
-          type: integer
     Student:
       type: object
       properties:
@@ -1780,9 +2300,6 @@ components:
           type: string
           nullable: true
           maxLength: 200
-        accommodations:
-          type: string
-          nullable: true
         user:
           type: integer
           nullable: true
@@ -1810,9 +2327,6 @@ components:
           type: string
           nullable: true
           maxLength: 200
-        accommodations:
-          type: string
-          nullable: true
         user:
           type: integer
           nullable: true
@@ -1830,14 +2344,15 @@ components:
         id:
           type: integer
           readOnly: true
+        uploaded_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionFile'
+          readOnly: true
         submission_time:
           type: string
           format: date-time
           readOnly: true
-        submission_file:
-          type: string
-          format: uri
-          nullable: true
         student:
           type: integer
         assignment:
@@ -1847,13 +2362,32 @@ components:
       - id
       - student
       - submission_time
+      - uploaded_files
+    SubmissionFile:
+      type: object
+      properties:
+        file:
+          type: string
+          format: uri
+      required:
+      - file
+    SubmissionFileRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+      - file
     SubmissionRequest:
       type: object
       properties:
-        submission_file:
-          type: string
-          format: binary
-          nullable: true
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+          writeOnly: true
         student:
           type: integer
         assignment:
@@ -1861,58 +2395,6 @@ components:
       required:
       - assignment
       - student
-    TokenObtainPair:
-      type: object
-      properties:
-        access:
-          type: string
-          readOnly: true
-        refresh:
-          type: string
-          readOnly: true
-      required:
-      - access
-      - refresh
-    TokenObtainPairRequest:
-      type: object
-      properties:
-        username:
-          type: string
-          writeOnly: true
-          minLength: 1
-        password:
-          type: string
-          writeOnly: true
-          minLength: 1
-      required:
-      - password
-      - username
-    TokenRefresh:
-      type: object
-      properties:
-        access:
-          type: string
-          readOnly: true
-      required:
-      - access
-    TokenRefreshRequest:
-      type: object
-      properties:
-        refresh:
-          type: string
-          writeOnly: true
-          minLength: 1
-      required:
-      - refresh
-    TokenVerifyRequest:
-      type: object
-      properties:
-        token:
-          type: string
-          writeOnly: true
-          minLength: 1
-      required:
-      - token
     User:
       type: object
       description: Serializer for the User model
@@ -1940,19 +2422,23 @@ components:
           type: boolean
         is_instructor:
           type: boolean
+        student_profile:
+          type: string
+          readOnly: true
+        instructor_profile:
+          type: string
+          readOnly: true
       required:
       - id
+      - instructor_profile
       - is_staff
+      - student_profile
       - username
   securitySchemes:
     cookieAuth:
       type: apiKey
       in: cookie
       name: sessionid
-    jwtAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
     tokenAuth:
       type: apiKey
       in: header
